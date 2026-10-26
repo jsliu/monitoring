@@ -11,6 +11,9 @@ scrape_configs:
   - job_name: node
     static_configs:
       - targets: ["host.docker.internal:9101"]
-  - job_name: thetagang  # thetagang-nt (../thetagang deploy/), published on the host's 127.0.0.1:9464
+  - job_name: thetagang  # thetagang's portfolio monitor (../thetagang deploy/), host's 127.0.0.1:9464
     static_configs:
       - targets: ["host.docker.internal:9464"]
+  - job_name: thetagang-strategy  # thetagang's trading strategy, only while it runs: 127.0.0.1:9465
+    static_configs:
+      - targets: ["host.docker.internal:9465"]

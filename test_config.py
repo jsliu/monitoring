@@ -44,7 +44,7 @@ def test_every_alert_window_has_its_route_and_a_new_york_time_interval():
     routes = {r["object_matchers"][0][2]: r for r in notifications["policies"][0]["routes"]}
     rules = _rules()
 
-    assert len(rules) == 13  # 6 intraday + 7 thetagang
+    assert len(rules) == 14  # 6 intraday + 8 thetagang
     for rule in rules:
         window = rule["labels"]["window"]
         assert routes[window]["active_time_intervals"] == [window]
@@ -55,8 +55,8 @@ def test_thetagang_alerts_query_only_thetagang_metrics():
     groups = _json(ALERTING / "rules.yaml")["groups"]
     rules = [r for g in groups if g["name"] == "thetagang" for r in g["rules"]]
     exprs = [d["model"]["expr"] for r in rules for d in r["data"] if "expr" in d["model"]]
-    assert len(rules) == 7 and all(r["labels"]["window"] == "thetagang" for r in rules)
-    assert all(re.findall(r"\bthetagang_[a-z_]+|up\{job=\"thetagang\"\}", e) for e in exprs)
+    assert len(rules) == 8 and all(r["labels"]["window"] == "thetagang" for r in rules)
+    assert all(re.findall(r"\bthetagang_[a-z_]+|up\{job=\"thetagang(-strategy)?\"\}", e) for e in exprs)
 
 
 def test_every_published_port_is_localhost_only_and_history_is_two_years():
@@ -66,7 +66,8 @@ def test_every_published_port_is_localhost_only_and_history_is_two_years():
     assert len(ports) == 2 and all(p.startswith("127.0.0.1:") for p in ports)
     assert "--storage.tsdb.retention.time=2y" in compose
     scrape = (ROOT / "prometheus.yml").read_text()
-    for target in ("host.docker.internal:9102", "host.docker.internal:9101", "host.docker.internal:9464"):
+    for target in ("host.docker.internal:9102", "host.docker.internal:9101", "host.docker.internal:9464",
+                   "host.docker.internal:9465"):
         assert f'"{target}"' in scrape
 
 
@@ -138,4 +139,35 @@ def test_the_intraday_daily_pnl_panel_shows_one_bar_per_new_york_close():
 def test_the_thetagang_tiles_show_the_latest_value_in_any_time_range():
     dashboard = _json(GRAFANA / "dashboards" / "thetagang" / "thetagang.json")
     tiles = [p for p in dashboard["panels"] if p["type"] == "stat"]
-    assert len(tiles) == 8 and all(t["instant"] and not t["range"] for p in tiles for t in p["targets"])
+    assert len(tiles) == 12 and all(t["instant"] and not t["range"] for p in tiles for t in p["targets"])
+
+
+def test_a_stopped_project_never_alerts_only_one_that_stops_after_running():
+    """Projects run independently: a "down" alert fires only if the target was up in the last 8 hours, so a project
+    that isn't run that day (intraday without thetagang, or the reverse) never alerts."""
+    rules = {r["uid"]: r for r in _rules()}
+    for uid, job in (("im-node-down", "node"), ("im-ib-disconnected", "exporter"), ("tg-bot-down", "thetagang"),
+                     ("tg-strategy-down", "thetagang-strategy")):
+        (expr,) = [d["model"]["expr"] for d in rules[uid]["data"] if d["refId"] == "A"]
+        (cond,) = [d["model"]["conditions"][0]["evaluator"] for d in rules[uid]["data"] if d["refId"] == "C"]
+        assert "max_over_time(" in expr and "[8h" in expr and f'up{{job="{job}"}}' in expr
+        assert cond == {"type": "gt", "params": [0.5]}
+    for rule in rules.values():  # every other rule is silent without data
+        assert rule["noDataState"] == "OK"
+
+
+def test_fit_sizes_tables_to_their_rows_and_restacks_the_bands():
+    import fit_tables as ft
+
+    assert ft.table_height(0) == ft.MIN_H and ft.table_height(40) > ft.table_height(10)
+    rows_px = ft.GRID_PX * ft.table_height(12) - 8
+    assert rows_px >= ft.CHROME_PX + ft.ROW_PX * 12  # all 12 rows fit
+    panels = [
+        {"type": "row", "gridPos": {"x": 0, "y": 0, "w": 24, "h": 1}},
+        {"type": "table", "gridPos": {"x": 0, "y": 1, "w": 12, "h": 9}},
+        {"type": "stat", "gridPos": {"x": 12, "y": 1, "w": 12, "h": 4}},  # same band
+        {"type": "table", "gridPos": {"x": 0, "y": 5, "w": 24, "h": 20}},  # next band
+        {"type": "row", "gridPos": {"x": 0, "y": 30, "w": 24, "h": 1}},
+    ]
+    ft.restack(panels)
+    assert [p["gridPos"]["y"] for p in panels] == [0, 1, 1, 10, 30]

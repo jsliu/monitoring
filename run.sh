@@ -5,6 +5,7 @@
 #   ./run.sh up          # start (or update) the stack; Grafana at http://localhost:3000 (user admin)
 #   ./run.sh status      # containers + which projects' metrics Prometheus can reach
 #   ./run.sh test-alert  # send a Telegram test message with .env's bot token and chat id
+#   ./run.sh fit         # size the thetagang tables to their rows (no scrollbars)
 #   ./run.sh down        # stop it (history is kept in the Docker volumes)
 #   ./run.sh render      # only (re)write Grafana's Telegram contact point from .env
 #
@@ -98,6 +99,9 @@ for t in json.load(sys.stdin)["data"]["activeTargets"]:
     print("  %-10s %-5s %s" % (t["labels"]["job"], t["health"], t["scrapeUrl"]))' \
             || echo "prometheus: not reachable (is the stack up?)"
         ;;
+    fit)
+        python3 fit_tables.py  # size the thetagang tables to their rows; Grafana reloads the file
+        ;;
     test-alert)
         need_env
         TELEGRAM_BOT_TOKEN=$(env_value TELEGRAM_BOT_TOKEN)
@@ -108,7 +112,7 @@ for t in json.load(sys.stdin)["data"]["activeTargets"]:
             && echo "sent -- check Telegram" || { echo "error: Telegram rejected the token / chat id" >&2; exit 1; }
         ;;
     *)
-        echo "usage: $0 up|down|status|test-alert|render" >&2
+        echo "usage: $0 up|down|status|fit|test-alert|render" >&2
         exit 2
         ;;
 esac

@@ -22,6 +22,11 @@ cp .env.example .env    # once: Grafana admin password, Telegram bot token and c
 
 Places no orders. Every published port is bound to `127.0.0.1`.
 
+The projects are monitored independently: a project you don't run that day
+sends no alerts. Each "down" alert (intraday's node and exporter, thetagang-nt)
+fires only if that target was up in the last 8 hours and has stopped; every
+other alert stays silent without data.
+
 ## Layout
 
 | Path | Contents |

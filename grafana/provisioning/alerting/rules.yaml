@@ -18,19 +18,19 @@
             "window": "core"
           },
           "annotations": {
-            "summary": "The momentum node's metrics are unreachable: is run_live_momentum.sh running?"
+            "summary": "The momentum node was running in the last 8 hours and its metrics are now unreachable: did run_live_momentum.sh stop?"
           },
           "data": [
             {
               "refId": "A",
               "relativeTimeRange": {
-                "from": 600,
+                "from": 28800,
                 "to": 0
               },
               "datasourceUid": "prometheus",
               "model": {
                 "refId": "A",
-                "expr": "max(up{job=\"node\"}) or vector(0)",
+                "expr": "(max(max_over_time(up{job=\"node\"}[8h])) or vector(0)) - (max(up{job=\"node\"}) or vector(0))",
                 "instant": true
               }
             },
@@ -44,9 +44,9 @@
                 "conditions": [
                   {
                     "evaluator": {
-                      "type": "lt",
+                      "type": "gt",
                       "params": [
-                        1
+                        0.5
                       ]
                     }
                   }
@@ -66,19 +66,19 @@
             "window": "extended"
           },
           "annotations": {
-            "summary": "The account exporter has no fresh IBKR data (TWS down or logged out, or the exporter stopped)."
+            "summary": "The account exporter had IBKR data in the last 8 hours and has none now (TWS down or logged out, or the exporter stopped)."
           },
           "data": [
             {
               "refId": "A",
               "relativeTimeRange": {
-                "from": 600,
+                "from": 28800,
                 "to": 0
               },
               "datasourceUid": "prometheus",
               "model": {
                 "refId": "A",
-                "expr": "(max(ib_up) or vector(0)) * (max(up{job=\"exporter\"}) or vector(0))",
+                "expr": "(max_over_time(((max(ib_up) or vector(0)) * (max(up{job=\"exporter\"}) or vector(0)))[8h:1m]) or vector(0)) - ((max(ib_up) or vector(0)) * (max(up{job=\"exporter\"}) or vector(0)))",
                 "instant": true
               }
             },
@@ -92,9 +92,9 @@
                 "conditions": [
                   {
                     "evaluator": {
-                      "type": "lt",
+                      "type": "gt",
                       "params": [
-                        1
+                        0.5
                       ]
                     }
                   }
@@ -305,7 +305,7 @@
       "rules": [
         {
           "uid": "tg-bot-down",
-          "title": "thetagang-nt down",
+          "title": "thetagang monitor down",
           "condition": "C",
           "for": "5m",
           "noDataState": "OK",
@@ -314,7 +314,7 @@
             "window": "thetagang"
           },
           "annotations": {
-            "summary": "thetagang-nt was running and stopped: nothing is rolled while it's down (cd ../thetagang/deploy && docker compose logs thetagang-nt)."
+            "summary": "thetagang's portfolio monitor was running and stopped: the dashboard is not updating (cd ../thetagang/deploy && docker compose logs thetagang-monitor)."
           },
           "data": [
             {
@@ -327,6 +327,54 @@
               "model": {
                 "refId": "A",
                 "expr": "(max(max_over_time(up{job=\"thetagang\"}[8h])) - max(up{job=\"thetagang\"})) or vector(0)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0.5
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "tg-strategy-down",
+          "title": "thetagang strategy down",
+          "condition": "C",
+          "for": "5m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang"
+          },
+          "annotations": {
+            "summary": "thetagang's trading strategy was running and stopped: nothing is rolled while it's down (cd ../thetagang/deploy && docker compose logs thetagang-nt)."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "(max(max_over_time(up{job=\"thetagang-strategy\"}[8h])) - max(up{job=\"thetagang-strategy\"})) or vector(0)",
                 "instant": true
               }
             },
