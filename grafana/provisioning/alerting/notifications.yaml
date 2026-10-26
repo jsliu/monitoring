@@ -1,0 +1,203 @@
+{
+  "apiVersion": 1,
+  "muteTimes": [
+    {
+      "orgId": 1,
+      "name": "core",
+      "time_intervals": [
+        {
+          "times": [
+            {
+              "start_time": "09:35",
+              "end_time": "15:35"
+            }
+          ],
+          "weekdays": [
+            "monday:friday"
+          ],
+          "location": "America/New_York"
+        }
+      ]
+    },
+    {
+      "orgId": 1,
+      "name": "extended",
+      "time_intervals": [
+        {
+          "times": [
+            {
+              "start_time": "09:25",
+              "end_time": "16:15"
+            }
+          ],
+          "weekdays": [
+            "monday:friday"
+          ],
+          "location": "America/New_York"
+        }
+      ]
+    },
+    {
+      "orgId": 1,
+      "name": "after_exit",
+      "time_intervals": [
+        {
+          "times": [
+            {
+              "start_time": "15:40",
+              "end_time": "16:30"
+            }
+          ],
+          "weekdays": [
+            "monday:friday"
+          ],
+          "location": "America/New_York"
+        }
+      ]
+    },
+    {
+      "orgId": 1,
+      "name": "session",
+      "time_intervals": [
+        {
+          "times": [
+            {
+              "start_time": "09:30",
+              "end_time": "16:15"
+            }
+          ],
+          "weekdays": [
+            "monday:friday"
+          ],
+          "location": "America/New_York"
+        }
+      ]
+    },
+    {
+      "orgId": 1,
+      "name": "stale",
+      "time_intervals": [
+        {
+          "times": [
+            {
+              "start_time": "09:45",
+              "end_time": "15:35"
+            }
+          ],
+          "weekdays": [
+            "monday:friday"
+          ],
+          "location": "America/New_York"
+        }
+      ]
+    },
+    {
+      "name": "thetagang",
+      "time_intervals": [
+        {
+          "times": [
+            {
+              "start_time": "09:30",
+              "end_time": "16:00"
+            }
+          ],
+          "weekdays": [
+            "monday:friday"
+          ],
+          "location": "America/New_York"
+        }
+      ]
+    }
+  ],
+  "policies": [
+    {
+      "orgId": 1,
+      "receiver": "telegram",
+      "group_by": [
+        "alertname"
+      ],
+      "repeat_interval": "1h",
+      "routes": [
+        {
+          "receiver": "telegram",
+          "object_matchers": [
+            [
+              "window",
+              "=",
+              "core"
+            ]
+          ],
+          "active_time_intervals": [
+            "core"
+          ]
+        },
+        {
+          "receiver": "telegram",
+          "object_matchers": [
+            [
+              "window",
+              "=",
+              "extended"
+            ]
+          ],
+          "active_time_intervals": [
+            "extended"
+          ]
+        },
+        {
+          "receiver": "telegram",
+          "object_matchers": [
+            [
+              "window",
+              "=",
+              "after_exit"
+            ]
+          ],
+          "active_time_intervals": [
+            "after_exit"
+          ]
+        },
+        {
+          "receiver": "telegram",
+          "object_matchers": [
+            [
+              "window",
+              "=",
+              "session"
+            ]
+          ],
+          "active_time_intervals": [
+            "session"
+          ]
+        },
+        {
+          "receiver": "telegram",
+          "object_matchers": [
+            [
+              "window",
+              "=",
+              "stale"
+            ]
+          ],
+          "active_time_intervals": [
+            "stale"
+          ]
+        },
+        {
+          "receiver": "telegram",
+          "object_matchers": [
+            [
+              "window",
+              "=",
+              "thetagang"
+            ]
+          ],
+          "active_time_intervals": [
+            "thetagang"
+          ],
+          "repeat_interval": "4h"
+        }
+      ]
+    }
+  ]
+}

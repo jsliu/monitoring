@@ -1,0 +1,23 @@
+{
+  "apiVersion": 1,
+  "providers": [
+    {
+      "name": "intraday",
+      "folder": "Intraday",
+      "type": "file",
+      "allowUiUpdates": false,
+      "options": {
+        "path": "/var/lib/grafana/dashboards/intraday"
+      }
+    },
+    {
+      "name": "thetagang",
+      "folder": "thetagang",
+      "type": "file",
+      "allowUiUpdates": false,
+      "options": {
+        "path": "/var/lib/grafana/dashboards/thetagang"
+      }
+    }
+  ]
+}

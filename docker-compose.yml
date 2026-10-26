@@ -1,0 +1,43 @@
+# Monitoring for the trading projects on this Mac: Prometheus + Grafana + Telegram alerts.
+# Each project serves its own metrics on the host's 127.0.0.1 and this stack scrapes them:
+#   ../intraday   account exporter :9102 (its monitoring/docker-compose.yml), momentum node :9101 (while it runs)
+#   ../thetagang  thetagang-nt :9464 (its deploy/docker-compose.yml)
+# Start/stop with ./run.sh (it reads .env). Every published port is bound to 127.0.0.1; nothing here places orders.
+name: monitoring
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.15.1
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.time=2y
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:13.2.4
+    environment:
+      # Only the admin password: the Telegram secrets reach Grafana solely through the rendered contact point.
+      GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD:?set it in .env}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro  # one subfolder per Grafana folder
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  prometheus-data: {}
+  grafana-data: {}

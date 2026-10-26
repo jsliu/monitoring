@@ -1,0 +1,645 @@
+{
+  "apiVersion": 1,
+  "groups": [
+    {
+      "orgId": 1,
+      "name": "intraday",
+      "folder": "Intraday",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "im-node-down",
+          "title": "Momentum node down",
+          "condition": "C",
+          "for": "5m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "core"
+          },
+          "annotations": {
+            "summary": "The momentum node's metrics are unreachable: is run_live_momentum.sh running?"
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "max(up{job=\"node\"}) or vector(0)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "lt",
+                      "params": [
+                        1
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "im-ib-disconnected",
+          "title": "IB / exporter disconnected",
+          "condition": "C",
+          "for": "5m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "extended"
+          },
+          "annotations": {
+            "summary": "The account exporter has no fresh IBKR data (TWS down or logged out, or the exporter stopped)."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "(max(ib_up) or vector(0)) * (max(up{job=\"exporter\"}) or vector(0))",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "lt",
+                      "params": [
+                        1
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "im-cfd-open-after-exit",
+          "title": "CFD open after the exit",
+          "condition": "C",
+          "for": "0m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "after_exit"
+          },
+          "annotations": {
+            "summary": "A SOXX CFD position is still open after the 15:30 exit -- close it in TWS."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "sum(abs(ib_position_qty{leg=\"momentum\"})) or vector(0)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "im-order-trouble",
+          "title": "Order rejected / cancelled / expired",
+          "condition": "C",
+          "for": "0m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "session"
+          },
+          "annotations": {
+            "summary": "A momentum order was rejected, cancelled or expired -- see intraday_trades/intraday_<date>.csv."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "sum(increase(im_orders_total{result!=\"filled\"}[5m])) or vector(0)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "im-daily-loss",
+          "title": "Daily loss limit",
+          "condition": "C",
+          "for": "0m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "session"
+          },
+          "annotations": {
+            "summary": "Today's account P&L is below -2% of net liquidation."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "(sum(ib_daily_pnl_usd) / sum(ib_net_liquidation_usd)) or vector(0)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "lt",
+                      "params": [
+                        -0.02
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "im-node-stale",
+          "title": "Momentum node stale",
+          "condition": "C",
+          "for": "0m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "stale"
+          },
+          "annotations": {
+            "summary": "The node is watching or in a position but has had no 5-min bar for 15 minutes."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "max(im_last_bar_age_seconds and on() (im_state == 2 or im_state == 3)) or vector(0)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        900
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "orgId": 1,
+      "name": "thetagang",
+      "folder": "thetagang",
+      "interval": "1m",
+      "rules": [
+        {
+          "uid": "tg-bot-down",
+          "title": "thetagang-nt down",
+          "condition": "C",
+          "for": "5m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang"
+          },
+          "annotations": {
+            "summary": "thetagang-nt was running and stopped: nothing is rolled while it's down (cd ../thetagang/deploy && docker compose logs thetagang-nt)."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "(max(max_over_time(up{job=\"thetagang\"}[8h])) - max(up{job=\"thetagang\"})) or vector(0)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0.5
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "tg-stale",
+          "title": "thetagang-nt data stale",
+          "condition": "C",
+          "for": "5m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang"
+          },
+          "annotations": {
+            "summary": "thetagang-nt hasn't refreshed for over 5 minutes (TWS disconnected or the node stuck)."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "time() - max(thetagang_last_update_timestamp_seconds)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        300
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "tg-missing-greeks",
+          "title": "thetagang positions without greeks",
+          "condition": "C",
+          "for": "30m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang"
+          },
+          "annotations": {
+            "summary": "{{ $values.A.Value }} position(s) have no greeks for 30 min: SPX delta is incomplete and new trades are blocked."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "max(thetagang_options_missing_greeks)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "tg-long-option",
+          "title": "thetagang long option to roll by hand",
+          "condition": "C",
+          "for": "0m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang"
+          },
+          "annotations": {
+            "summary": "{{ $values.A.Value }} long option(s) at or above long_option_alert_delta: roll or close by hand (the bot never trades them)."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "max(thetagang_long_option_alerts)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "tg-delta-band",
+          "title": "thetagang SPX delta out of band",
+          "condition": "C",
+          "for": "1h",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang"
+          },
+          "annotations": {
+            "summary": "SPX delta has been outside delta_band for an hour with trading on: the hedge isn't happening (trades blocked or capped)."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "(abs(max(thetagang_spx_delta)) - max(thetagang_strategy_delta_band)) * (1 - max(thetagang_strategy_dry_run))",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "tg-stress",
+          "title": "thetagang stress loss",
+          "condition": "C",
+          "for": "15m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang"
+          },
+          "annotations": {
+            "summary": "A -10% SPX move would lose {{ humanizePercentage (mul $values.A.Value -1) }} of net liquidation (limit 5%)."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "min(thetagang_stress_pnl{move=\"-10%\",betas=\"beta\"}) / sum(thetagang_net_liquidation)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "lt",
+                      "params": [
+                        -0.05
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "uid": "tg-orders",
+          "title": "thetagang order sent",
+          "condition": "C",
+          "for": "0m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang"
+          },
+          "annotations": {
+            "summary": "thetagang-nt sent real order(s) in the last 10 min: see docker compose logs thetagang-nt."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "sum(increase(thetagang_orders_total{dry_run=\"false\"}[10m])) or vector(0)",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

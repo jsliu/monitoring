@@ -1,0 +1,9 @@
+# secrets: the Grafana password and Telegram token, and the contact point rendered from them
+.env
+.env.*
+!.env.example
+grafana/provisioning/alerting/contact-point.yaml
+grafana/provisioning/alerting/contact-point.yaml.tmp
+.DS_Store
+__pycache__/
+.pytest_cache/
