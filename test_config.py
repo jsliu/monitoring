@@ -138,8 +138,10 @@ def test_the_intraday_daily_pnl_panel_shows_one_bar_per_new_york_close():
 
 def test_the_thetagang_tiles_show_the_latest_value_in_any_time_range():
     dashboard = _json(GRAFANA / "dashboards" / "thetagang" / "thetagang.json")
-    tiles = [p for p in dashboard["panels"] if p["type"] == "stat"]
-    assert len(tiles) == 12 and all(t["instant"] and not t["range"] for p in tiles for t in p["targets"])
+    tiles = [p for p in dashboard["panels"] if p["type"] in ("stat", "gauge")]
+    assert len(tiles) == 16
+    for p in tiles:  # an instant value, or a sparkline pinned to the last 24 h whatever range is picked
+        assert all(t["instant"] and not t["range"] for t in p["targets"]) or p.get("timeFrom") == "24h", p["title"]
 
 
 def test_a_stopped_project_never_alerts_only_one_that_stops_after_running():

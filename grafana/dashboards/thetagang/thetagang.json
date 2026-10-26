@@ -42,7 +42,7 @@
     "x": 0,
     "y": 1,
     "w": 6,
-    "h": 4
+    "h": 5
    },
    "targets": [
     {
@@ -53,8 +53,8 @@
      "refId": "A",
      "expr": "sum(thetagang_net_liquidation)",
      "legendFormat": "net liq",
-     "instant": true,
-     "range": false
+     "instant": false,
+     "range": true
     }
    ],
    "fieldConfig": {
@@ -68,7 +68,7 @@
       "mode": "absolute",
       "steps": [
        {
-        "color": "text",
+        "color": "#1F60C4",
         "value": null
        }
       ]
@@ -80,12 +80,18 @@
     "reduceOptions": {
      "calcs": [
       "lastNotNull"
-     ]
+     ],
+     "fields": "",
+     "values": false
     },
-    "colorMode": "value",
-    "graphMode": "none",
-    "textMode": "value"
-   }
+    "colorMode": "background",
+    "graphMode": "area",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true
+   },
+   "timeFrom": "24h",
+   "hideTimeOverride": true
   },
   {
    "id": 2,
@@ -100,7 +106,7 @@
     "x": 6,
     "y": 1,
     "w": 6,
-    "h": 4
+    "h": 5
    },
    "targets": [
     {
@@ -111,8 +117,8 @@
      "refId": "A",
      "expr": "thetagang_unrealized_pnl",
      "legendFormat": "unrealized",
-     "instant": true,
-     "range": false
+     "instant": false,
+     "range": true
     }
    ],
    "fieldConfig": {
@@ -142,12 +148,154 @@
     "reduceOptions": {
      "calcs": [
       "lastNotNull"
-     ]
+     ],
+     "fields": "",
+     "values": false
     },
-    "colorMode": "value",
-    "graphMode": "none",
-    "textMode": "value"
-   }
+    "colorMode": "background",
+    "graphMode": "area",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true
+   },
+   "timeFrom": "24h",
+   "hideTimeOverride": true
+  },
+  {
+   "id": 39,
+   "type": "stat",
+   "title": "P&L today",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "description": "IB daily P&L summed over positions (the attribution table's total)",
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_symbol_pnl{part=\"pnl\"})",
+     "legendFormat": "today",
+     "range": true,
+     "instant": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "graphMode": "area",
+    "colorMode": "background",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true,
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    }
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 1,
+    "w": 6,
+    "h": 5
+   },
+   "timeFrom": "24h",
+   "hideTimeOverride": true
+  },
+  {
+   "id": 19,
+   "type": "stat",
+   "title": "SPX move today",
+   "description": "SPX since the last close",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_spx_move_today",
+     "legendFormat": "",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 2,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "area",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true
+   },
+   "gridPos": {
+    "x": 18,
+    "y": 1,
+    "w": 6,
+    "h": 5
+   },
+   "timeFrom": "24h",
+   "hideTimeOverride": true
   },
   {
    "id": 3,
@@ -159,10 +307,10 @@
     "uid": "prometheus"
    },
    "gridPos": {
-    "x": 12,
-    "y": 1,
-    "w": 6,
-    "h": 4
+    "x": 0,
+    "y": 6,
+    "w": 4,
+    "h": 5
    },
    "targets": [
     {
@@ -173,8 +321,8 @@
      "refId": "A",
      "expr": "thetagang_spx_delta",
      "legendFormat": "SPX delta",
-     "instant": true,
-     "range": false
+     "instant": false,
+     "range": true
     }
    ],
    "fieldConfig": {
@@ -188,8 +336,12 @@
       "mode": "absolute",
       "steps": [
        {
-        "color": "text",
+        "color": "red",
         "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
        }
       ]
      }
@@ -200,12 +352,86 @@
     "reduceOptions": {
      "calcs": [
       "lastNotNull"
-     ]
+     ],
+     "fields": "",
+     "values": false
     },
     "colorMode": "value",
-    "graphMode": "none",
-    "textMode": "value"
-   }
+    "graphMode": "area",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true
+   },
+   "timeFrom": "24h",
+   "hideTimeOverride": true
+  },
+  {
+   "id": 43,
+   "type": "stat",
+   "title": "Beta delta $",
+   "description": "Portfolio delta $ x beta: SPX delta x SPX price. +1% SPX \u2248 1% of this",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 4,
+    "y": 6,
+    "w": 4,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_beta_delta_dollars",
+     "legendFormat": "beta delta $",
+     "instant": false,
+     "range": true
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "area",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true
+   },
+   "timeFrom": "24h",
+   "hideTimeOverride": true
   },
   {
    "id": 4,
@@ -217,10 +443,10 @@
     "uid": "prometheus"
    },
    "gridPos": {
-    "x": 18,
-    "y": 1,
-    "w": 6,
-    "h": 4
+    "x": 8,
+    "y": 6,
+    "w": 4,
+    "h": 5
    },
    "targets": [
     {
@@ -231,8 +457,8 @@
      "refId": "A",
      "expr": "thetagang_theta",
      "legendFormat": "",
-     "instant": true,
-     "range": false
+     "instant": false,
+     "range": true
     }
    ],
    "fieldConfig": {
@@ -246,8 +472,12 @@
       "mode": "absolute",
       "steps": [
        {
-        "color": "text",
+        "color": "red",
         "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
        }
       ]
      }
@@ -258,12 +488,18 @@
     "reduceOptions": {
      "calcs": [
       "lastNotNull"
-     ]
+     ],
+     "fields": "",
+     "values": false
     },
     "colorMode": "value",
-    "graphMode": "none",
-    "textMode": "value"
-   }
+    "graphMode": "area",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true
+   },
+   "timeFrom": "24h",
+   "hideTimeOverride": true
   },
   {
    "id": 5,
@@ -275,10 +511,10 @@
     "uid": "prometheus"
    },
    "gridPos": {
-    "x": 0,
-    "y": 5,
-    "w": 5,
-    "h": 4
+    "x": 12,
+    "y": 6,
+    "w": 4,
+    "h": 5
    },
    "targets": [
     {
@@ -289,8 +525,8 @@
      "refId": "A",
      "expr": "thetagang_vega",
      "legendFormat": "",
-     "instant": true,
-     "range": false
+     "instant": false,
+     "range": true
     }
    ],
    "fieldConfig": {
@@ -304,8 +540,12 @@
       "mode": "absolute",
       "steps": [
        {
-        "color": "text",
+        "color": "red",
         "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
        }
       ]
      }
@@ -316,12 +556,18 @@
     "reduceOptions": {
      "calcs": [
       "lastNotNull"
-     ]
+     ],
+     "fields": "",
+     "values": false
     },
     "colorMode": "value",
-    "graphMode": "none",
-    "textMode": "value"
-   }
+    "graphMode": "area",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true
+   },
+   "timeFrom": "24h",
+   "hideTimeOverride": true
   },
   {
    "id": 28,
@@ -333,10 +579,10 @@
     "uid": "prometheus"
    },
    "gridPos": {
-    "x": 5,
-    "y": 5,
-    "w": 5,
-    "h": 4
+    "x": 16,
+    "y": 6,
+    "w": 4,
+    "h": 5
    },
    "targets": [
     {
@@ -347,8 +593,8 @@
      "refId": "A",
      "expr": "thetagang_volga",
      "legendFormat": "",
-     "instant": true,
-     "range": false
+     "instant": false,
+     "range": true
     }
    ],
    "fieldConfig": {
@@ -362,8 +608,12 @@
       "mode": "absolute",
       "steps": [
        {
-        "color": "text",
+        "color": "red",
         "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
        }
       ]
      }
@@ -374,12 +624,18 @@
     "reduceOptions": {
      "calcs": [
       "lastNotNull"
-     ]
+     ],
+     "fields": "",
+     "values": false
     },
     "colorMode": "value",
-    "graphMode": "none",
-    "textMode": "value"
-   }
+    "graphMode": "area",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true
+   },
+   "timeFrom": "24h",
+   "hideTimeOverride": true
   },
   {
    "id": 6,
@@ -391,10 +647,10 @@
     "uid": "prometheus"
    },
    "gridPos": {
-    "x": 10,
-    "y": 5,
-    "w": 5,
-    "h": 4
+    "x": 20,
+    "y": 6,
+    "w": 4,
+    "h": 5
    },
    "targets": [
     {
@@ -405,8 +661,8 @@
      "refId": "A",
      "expr": "thetagang_gamma_spx",
      "legendFormat": "",
-     "instant": true,
-     "range": false
+     "instant": false,
+     "range": true
     }
    ],
    "fieldConfig": {
@@ -420,70 +676,12 @@
       "mode": "absolute",
       "steps": [
        {
-        "color": "text",
-        "value": null
-       }
-      ]
-     }
-    },
-    "overrides": []
-   },
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ]
-    },
-    "colorMode": "value",
-    "graphMode": "none",
-    "textMode": "value"
-   }
-  },
-  {
-   "id": 7,
-   "type": "stat",
-   "title": "Need attention",
-   "description": "Positions without greeks (blocks new trades) + long options with |delta| >= long_option_alert_delta",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "gridPos": {
-    "x": 15,
-    "y": 5,
-    "w": 5,
-    "h": 4
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "thetagang_options_missing_greeks + thetagang_long_option_alerts",
-     "legendFormat": "",
-     "instant": true,
-     "range": false
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "unit": "none",
-     "decimals": 0,
-     "color": {
-      "mode": "thresholds"
-     },
-     "thresholds": {
-      "mode": "absolute",
-      "steps": [
-       {
-        "color": "text",
+        "color": "red",
         "value": null
        },
        {
-        "color": "red",
-        "value": 1
+        "color": "green",
+        "value": 0
        }
       ]
      }
@@ -494,74 +692,18 @@
     "reduceOptions": {
      "calcs": [
       "lastNotNull"
-     ]
+     ],
+     "fields": "",
+     "values": false
     },
     "colorMode": "value",
-    "graphMode": "none",
-    "textMode": "value"
-   }
-  },
-  {
-   "id": 8,
-   "type": "stat",
-   "title": "Data age",
-   "description": "Seconds since the monitor last refreshed",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
+    "graphMode": "area",
+    "textMode": "value",
+    "justifyMode": "center",
+    "wideLayout": true
    },
-   "gridPos": {
-    "x": 20,
-    "y": 5,
-    "w": 4,
-    "h": 4
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "time() - thetagang_last_update_timestamp_seconds",
-     "legendFormat": "",
-     "instant": true,
-     "range": false
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {
-     "unit": "s",
-     "decimals": 0,
-     "color": {
-      "mode": "thresholds"
-     },
-     "thresholds": {
-      "mode": "absolute",
-      "steps": [
-       {
-        "color": "text",
-        "value": null
-       },
-       {
-        "color": "red",
-        "value": 300
-       }
-      ]
-     }
-    },
-    "overrides": []
-   },
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ]
-    },
-    "colorMode": "value",
-    "graphMode": "none",
-    "textMode": "value"
-   }
+   "timeFrom": "24h",
+   "hideTimeOverride": true
   },
   {
    "id": 18,
@@ -638,17 +780,6 @@
      "legendFormat": "Buying power",
      "instant": true,
      "range": false
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "G",
-     "expr": "sum(thetagang_account_value{field=\"cushion\"})",
-     "legendFormat": "Cushion",
-     "instant": true,
-     "range": false
     }
    ],
    "fieldConfig": {
@@ -687,23 +818,173 @@
     },
     "colorMode": "none",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "justifyMode": "center",
+    "wideLayout": true
    },
    "gridPos": {
     "x": 0,
-    "y": 9,
-    "w": 21,
-    "h": 4
+    "y": 11,
+    "w": 12,
+    "h": 5
    }
   },
   {
-   "id": 19,
-   "type": "stat",
-   "title": "SPX move today",
-   "description": "SPX since the last close",
+   "id": 40,
+   "type": "gauge",
+   "title": "Cushion",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
+   },
+   "description": "Excess liquidity / net liquidation. IB liquidates at 0.",
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_account_value{field=\"cushion\"})",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 1,
+     "min": 0,
+     "max": 1,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "orange",
+        "value": 0.1
+       },
+       {
+        "color": "green",
+        "value": 0.2
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "showThresholdMarkers": true,
+    "showThresholdLabels": false,
+    "minVizHeight": 75,
+    "minVizWidth": 75,
+    "sizing": "auto"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 11,
+    "w": 3,
+    "h": 5
+   }
+  },
+  {
+   "id": 41,
+   "type": "gauge",
+   "title": "Margin used",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "description": "Margin in use as a share of net liquidation",
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_margin_used) / sum(thetagang_net_liquidation)",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 1,
+     "min": 0,
+     "max": 1,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "orange",
+        "value": 0.5
+       },
+       {
+        "color": "red",
+        "value": 0.75
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "showThresholdMarkers": true,
+    "showThresholdLabels": false,
+    "minVizHeight": 75,
+    "minVizWidth": 75,
+    "sizing": "auto"
+   },
+   "gridPos": {
+    "x": 15,
+    "y": 11,
+    "w": 3,
+    "h": 5
+   }
+  },
+  {
+   "id": 7,
+   "type": "stat",
+   "title": "Need attention",
+   "description": "Positions without greeks (blocks new trades) + long options with |delta| >= long_option_alert_delta",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 18,
+    "y": 11,
+    "w": 3,
+    "h": 5
    },
    "targets": [
     {
@@ -712,7 +993,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "thetagang_spx_move_today",
+     "expr": "thetagang_options_missing_greeks + thetagang_long_option_alerts",
      "legendFormat": "",
      "instant": true,
      "range": false
@@ -720,8 +1001,35 @@
    ],
    "fieldConfig": {
     "defaults": {
-     "unit": "percentunit",
-     "decimals": 2
+     "unit": "none",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "red",
+        "value": 1
+       }
+      ]
+     },
+     "mappings": [
+      {
+       "type": "value",
+       "options": {
+        "0": {
+         "text": "All clear",
+         "color": "green"
+        }
+       }
+      }
+     ]
     },
     "overrides": []
    },
@@ -731,14 +1039,77 @@
       "lastNotNull"
      ]
     },
-    "colorMode": "value",
-    "graphMode": "none"
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center"
+   }
+  },
+  {
+   "id": 8,
+   "type": "stat",
+   "title": "Data age",
+   "description": "Seconds since the monitor last refreshed",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
    },
    "gridPos": {
     "x": 21,
-    "y": 9,
+    "y": 11,
     "w": 3,
-    "h": 4
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "time() - thetagang_last_update_timestamp_seconds",
+     "legendFormat": "",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "s",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "orange",
+        "value": 120
+       },
+       {
+        "color": "red",
+        "value": 300
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ]
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "value",
+    "justifyMode": "center"
    }
   },
   {
@@ -749,7 +1120,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 13,
+    "y": 16,
     "w": 24,
     "h": 1
    },
@@ -773,19 +1144,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "sum by (greek, scenario) (thetagang_greeks)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "B",
-     "expr": "label_replace(sum by (greek) (thetagang_greeks_after_trades), \"scenario\", \"after_trades\", \"\", \"\")",
+     "expr": "sum by (greek, scenario) (thetagang_greeks) or label_replace(sum by (greek) (thetagang_greeks_after_trades), \"scenario\", \"after_trades\", \"\", \"\")",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -795,26 +1154,8 @@
    "fieldConfig": {
     "defaults": {
      "decimals": 2,
-     "thresholds": {
-      "mode": "absolute",
-      "steps": [
-       {
-        "color": "red",
-        "value": null
-       },
-       {
-        "color": "green",
-        "value": 0
-       }
-      ]
-     },
-     "color": {
-      "mode": "thresholds"
-     },
      "custom": {
-      "cellOptions": {
-       "type": "color-text"
-      }
+      "minWidth": 80
      }
     },
     "overrides": []
@@ -823,9 +1164,6 @@
     "cellHeight": "sm"
    },
    "transformations": [
-    {
-     "id": "merge"
-    },
     {
      "id": "groupingToMatrix",
      "options": {
@@ -848,13 +1186,16 @@
        "after_proposals": "After proposals",
        "after_trades": "After trades",
        "now": "Now"
+      },
+      "excludeByName": {
+       "Time": true
       }
      }
     }
    ],
    "gridPos": {
     "x": 0,
-    "y": 14,
+    "y": 17,
     "w": 8,
     "h": 11
    }
@@ -862,17 +1203,17 @@
   {
    "id": 12,
    "type": "table",
-   "title": "Stress P&L (options repriced at current IV)",
-   "description": "Each stock moves beta x the SPX move (betas=beta) or 1 x (betas=one). A big gap = the hedge leans on beta estimates.",
+   "title": "Stress P&L by SPX move",
+   "description": "Options repriced at current IV. Beta-weighted: each stock moves beta x the SPX move; All betas = 1: every stock moves with SPX.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
    },
    "gridPos": {
     "x": 8,
-    "y": 14,
+    "y": 17,
     "w": 8,
-    "h": 8
+    "h": 11
    },
    "targets": [
     {
@@ -881,7 +1222,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "sum by (move, betas) (thetagang_stress_pnl)",
+     "expr": "label_replace(label_replace(label_replace(label_replace(sum by (move, betas) (thetagang_stress_pnl), \"row\", \"1\", \"move\", \"-10%\"), \"row\", \"2\", \"move\", \"-5%\"), \"row\", \"3\", \"move\", \"\\\\+5%\"), \"row\", \"4\", \"move\", \"\\\\+10%\")",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -891,11 +1232,9 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "custom": {
-      "align": "right",
-      "cellOptions": {
-       "type": "color-text"
-      }
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
      },
      "thresholds": {
       "mode": "absolute",
@@ -910,22 +1249,101 @@
        }
       ]
      },
-     "color": {
-      "mode": "thresholds"
+     "custom": {
+      "align": "center",
+      "cellOptions": {
+       "type": "color-background",
+       "mode": "gradient"
+      },
+      "minWidth": 100
      }
     },
-    "overrides": []
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "SPX move"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "auto"
+        }
+       },
+       {
+        "id": "custom.align",
+        "value": "left"
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "1": {
+            "text": "-10%",
+            "index": 0
+           },
+           "2": {
+            "text": "-5%",
+            "index": 1
+           },
+           "3": {
+            "text": "+5%",
+            "index": 2
+           },
+           "4": {
+            "text": "+10%",
+            "index": 3
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 90
+       }
+      ]
+     }
+    ]
    },
    "options": {
-    "cellHeight": "sm"
+    "cellHeight": "lg"
    },
    "transformations": [
     {
      "id": "groupingToMatrix",
      "options": {
       "columnField": "betas",
-      "rowField": "move",
+      "rowField": "row",
       "valueField": "Value"
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "row\\betas"
+       }
+      ]
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "indexByName": {
+       "row\\betas": 0,
+       "beta": 1,
+       "one": 2
+      },
+      "renameByName": {
+       "row\\betas": "SPX move",
+       "beta": "Beta-weighted",
+       "one": "All betas = 1"
+      }
      }
     }
    ]
@@ -975,7 +1393,12 @@
     }
    ],
    "fieldConfig": {
-    "defaults": {},
+    "defaults": {
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "#FF9830"
+     }
+    },
     "overrides": [
      {
       "matcher": {
@@ -1001,15 +1424,17 @@
       "lastNotNull"
      ]
     },
-    "colorMode": "none",
+    "colorMode": "value",
     "graphMode": "none",
-    "textMode": "value_and_name"
+    "textMode": "value_and_name",
+    "justifyMode": "center",
+    "orientation": "horizontal"
    },
    "gridPos": {
     "x": 16,
-    "y": 14,
+    "y": 17,
     "w": 5,
-    "h": 5
+    "h": 11
    }
   },
   {
@@ -1058,9 +1483,9 @@
    ],
    "gridPos": {
     "x": 21,
-    "y": 14,
+    "y": 17,
     "w": 3,
-    "h": 5
+    "h": 11
    }
   },
   {
@@ -1071,7 +1496,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 25,
+    "y": 28,
     "w": 24,
     "h": 1
    },
@@ -1090,9 +1515,9 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 26,
-    "w": 10,
-    "h": 10
+    "y": 29,
+    "w": 14,
+    "h": 11
    },
    "targets": [
     {
@@ -1110,7 +1535,30 @@
    ],
    "fieldConfig": {
     "defaults": {
-     "unit": "currencyUSD"
+     "unit": "currencyUSD",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     },
+     "custom": {
+      "fillOpacity": 85,
+      "gradientMode": "hue",
+      "lineWidth": 0,
+      "axisBorderShow": false,
+      "axisCenteredZero": true
+     }
     },
     "overrides": []
    },
@@ -1120,7 +1568,11 @@
     "showValue": "auto",
     "legend": {
      "showLegend": false
-    }
+    },
+    "colorByField": "Value",
+    "barWidth": 0.8,
+    "groupWidth": 0.8,
+    "xTickLabelSpacing": 0
    },
    "transformations": [
     {
@@ -1135,6 +1587,67 @@
      }
     }
    ]
+  },
+  {
+   "id": 42,
+   "type": "piechart",
+   "title": "Share of SPX exposure",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "description": "|Beta delta $| per symbol: where the market risk sits",
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "abs(sum by (symbol) (thetagang_symbol_beta_delta_dollars)) > 0",
+     "legendFormat": "{{symbol}}",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "palette-classic"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "pieType": "donut",
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "legend": {
+     "showLegend": true,
+     "displayMode": "table",
+     "placement": "right",
+     "values": [
+      "percent"
+     ]
+    },
+    "tooltip": {
+     "mode": "single"
+    },
+    "displayLabels": []
+   },
+   "gridPos": {
+    "x": 14,
+    "y": 29,
+    "w": 10,
+    "h": 11
+   }
   },
   {
    "id": 23,
@@ -1604,7 +2117,15 @@
     ]
    },
    "options": {
-    "cellHeight": "sm"
+    "cellHeight": "sm",
+    "footer": {
+     "show": true,
+     "reducer": [
+      "sum"
+     ],
+     "fields": "",
+     "countRows": false
+    }
    },
    "transformations": [
     {
@@ -1642,10 +2163,10 @@
     }
    ],
    "gridPos": {
-    "x": 10,
-    "y": 26,
-    "w": 14,
-    "h": 26
+    "x": 0,
+    "y": 40,
+    "w": 24,
+    "h": 27
    }
   },
   {
@@ -1659,9 +2180,9 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 52,
+    "y": 67,
     "w": 24,
-    "h": 25
+    "h": 26
    },
    "targets": [
     {
@@ -2087,7 +2608,15 @@
     ]
    },
    "options": {
-    "cellHeight": "sm"
+    "cellHeight": "sm",
+    "footer": {
+     "show": true,
+     "reducer": [
+      "sum"
+     ],
+     "fields": "",
+     "countRows": false
+    }
    },
    "transformations": [
     {
@@ -2529,7 +3058,7 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 77,
+    "y": 93,
     "w": 24,
     "h": 26
    }
@@ -2542,7 +3071,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 103,
+    "y": 119,
     "w": 24,
     "h": 1
    },
@@ -2623,7 +3152,7 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 104,
+    "y": 120,
     "w": 24,
     "h": 15
    },
@@ -2960,7 +3489,7 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 119,
+    "y": 135,
     "w": 24,
     "h": 16
    },
@@ -3285,7 +3814,7 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 135,
+    "y": 151,
     "w": 24,
     "h": 12
    },
@@ -3527,7 +4056,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 147,
+    "y": 163,
     "w": 24,
     "h": 1
    },
@@ -3546,7 +4075,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 148,
+    "y": 164,
     "w": 24,
     "h": 46
    },
@@ -3750,7 +4279,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 194,
+    "y": 210,
     "w": 24,
     "h": 1
    },
@@ -3876,7 +4405,7 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 195,
+    "y": 211,
     "w": 16,
     "h": 4
    }
@@ -3927,7 +4456,7 @@
    ],
    "gridPos": {
     "x": 16,
-    "y": 195,
+    "y": 211,
     "w": 8,
     "h": 4
    }
@@ -3940,7 +4469,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 199,
+    "y": 215,
     "w": 24,
     "h": 1
    },
@@ -3959,7 +4488,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 200,
+    "y": 216,
     "w": 12,
     "h": 8
    },
@@ -3988,10 +4517,44 @@
      "unit": "none",
      "custom": {
       "lineWidth": 2,
-      "showPoints": "never"
+      "showPoints": "never",
+      "fillOpacity": 18,
+      "gradientMode": "opacity",
+      "lineInterpolation": "smooth"
      }
     },
-    "overrides": []
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "VIX"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#FF9830"
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "VIXMO"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "#B877D9"
+        }
+       }
+      ]
+     }
+    ]
    },
    "options": {}
   },
@@ -4006,7 +4569,7 @@
    },
    "gridPos": {
     "x": 12,
-    "y": 200,
+    "y": 216,
     "w": 12,
     "h": 8
    },
@@ -4026,7 +4589,13 @@
      "unit": "none",
      "custom": {
       "lineWidth": 2,
-      "showPoints": "never"
+      "showPoints": "never",
+      "drawStyle": "bars",
+      "fillOpacity": 70,
+      "gradientMode": "hue",
+      "stacking": {
+       "mode": "normal"
+      }
      }
     },
     "overrides": []
@@ -4034,5 +4603,6 @@
    "options": {}
   }
  ],
- "editable": true
+ "editable": true,
+ "graphTooltip": 1
 }

@@ -49,22 +49,32 @@ def row_count(panel: dict) -> int:
 
 
 def restack(panels: list[dict]) -> None:
-    """Keep the order, x and width; give each band (panels that shared a y) the
-    height of its tallest panel and lay the bands and section rows top to bottom."""
-    y, band_y, band_h = 0, None, 0
+    """Keep the order, x and width; stretch each band (panels that shared a y)
+    to its tallest panel so bottoms line up, and lay the bands and section rows
+    top to bottom."""
+    y, band_y, band = 0, None, []
+
+    def close_band() -> int:
+        h = max((p["gridPos"]["h"] for p in band), default=0)
+        for p in band:
+            p["gridPos"]["h"] = h
+        band.clear()
+        return h
+
     for panel in panels:
         pos = panel["gridPos"]
         if panel["type"] == "row":
-            y += band_h
-            band_y, band_h = None, 0
+            y += close_band()
+            band_y = None
             pos["y"] = y
             y += 1
             continue
         if pos["y"] != band_y:  # a new band: compared with the original y
-            y += band_h
-            band_y, band_h = pos["y"], 0
+            y += close_band()
+            band_y = pos["y"]
         pos["y"] = y
-        band_h = max(band_h, pos["h"])
+        band.append(panel)
+    close_band()
 
 
 def fit(path: Path, dry_run: bool) -> None:
@@ -72,7 +82,8 @@ def fit(path: Path, dry_run: bool) -> None:
     for panel in dashboard["panels"]:
         if panel["type"] == "table":
             rows = row_count(panel)
-            panel["gridPos"]["h"] = table_height(rows)
+            footer = panel.get("options", {}).get("footer", {}).get("show", False)
+            panel["gridPos"]["h"] = table_height(rows + footer)
             print(f"  {panel['title'][:58]:58} {rows:3} rows -> h {panel['gridPos']['h']}")
     restack(dashboard["panels"])
     if not dry_run:
