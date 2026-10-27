@@ -1,0 +1,1061 @@
+{
+ "uid": "thetagang-pretrade",
+ "title": "thetagang pre-trade",
+ "tags": [
+  "thetagang",
+  "nautilus"
+ ],
+ "schemaVersion": 41,
+ "refresh": "10s",
+ "time": {
+  "from": "now-15m",
+  "to": "now"
+ },
+ "timezone": "browser",
+ "editable": true,
+ "graphTooltip": 1,
+ "panels": [
+  {
+   "id": 1,
+   "type": "text",
+   "title": "",
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 2
+   },
+   "options": {
+    "mode": "markdown",
+    "content": "**Pre-trade**: what proposed trades do to the portfolio, while `thetagang-nt pretrade` waits for your y/N (`deploy/pretrade.sh` in the thetagang repo). Empty when nothing is being proposed. *After* = held positions + the proposal, computed with the same code as the main dashboard."
+   }
+  },
+  {
+   "id": 2,
+   "type": "stat",
+   "title": "Status",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 2,
+    "w": 6,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pretrade_status",
+     "legendFormat": "{{status}}",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "noValue": "no proposal",
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "text"
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byRegexp",
+       "options": "awaiting.*"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "orange"
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byRegexp",
+       "options": "sent.*"
+      },
+      "properties": [
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "green"
+        }
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "graphMode": "none",
+    "textMode": "name",
+    "colorMode": "value",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {
+     "titleSize": 22
+    },
+    "wideLayout": true
+   }
+  },
+  {
+   "id": 3,
+   "type": "stat",
+   "title": "Total cost",
+   "description": "Sum of qty x mid x multiplier over the proposal: + pays (debit), - receives (credit)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 6,
+    "y": 2,
+    "w": 6,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pretrade_trade{field=\"cost\"})",
+     "legendFormat": "cost",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "fixed",
+      "fixedColor": "text"
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "graphMode": "none",
+    "textMode": "value",
+    "colorMode": "value",
+    "orientation": "horizontal",
+    "justifyMode": "center",
+    "text": {},
+    "wideLayout": true
+   }
+  },
+  {
+   "id": 4,
+   "type": "stat",
+   "title": "SPX delta neutrality",
+   "description": "Neutral: |beta delta $| within the band; drifting: up to twice it; off neutral: beyond",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 2,
+    "w": 12,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"neutrality\",scenario=\"now\"})",
+     "legendFormat": "Now",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"neutrality\",scenario=\"after\"})",
+     "legendFormat": "After",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "text",
+        "value": null
+       }
+      ]
+     },
+     "mappings": [
+      {
+       "type": "value",
+       "options": {
+        "0": {
+         "text": "neutral",
+         "color": "green",
+         "index": 0
+        },
+        "1": {
+         "text": "drifting",
+         "color": "orange",
+         "index": 1
+        },
+        "2": {
+         "text": "off neutral",
+         "color": "red",
+         "index": 2
+        }
+       }
+      }
+     ]
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "colorMode": "background",
+    "orientation": "vertical",
+    "justifyMode": "center",
+    "text": {
+     "titleSize": 14,
+     "valueSize": 26
+    },
+    "wideLayout": true
+   }
+  },
+  {
+   "id": 5,
+   "type": "stat",
+   "title": "SPX delta",
+   "description": "Beta-weighted, SPX units",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 7,
+    "w": 4,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"spx_delta\",scenario=\"now\"})",
+     "legendFormat": "Now",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"spx_delta\",scenario=\"after\"})",
+     "legendFormat": "After",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 2,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "text",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "colorMode": "value",
+    "orientation": "horizontal",
+    "justifyMode": "auto",
+    "text": {
+     "titleSize": 13,
+     "valueSize": 22
+    },
+    "wideLayout": true
+   }
+  },
+  {
+   "id": 6,
+   "type": "stat",
+   "title": "Beta delta $",
+   "description": "SPX delta x SPX price",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 4,
+    "y": 7,
+    "w": 4,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"beta_delta_dollars\",scenario=\"now\"})",
+     "legendFormat": "Now",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"beta_delta_dollars\",scenario=\"after\"})",
+     "legendFormat": "After",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "text",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "colorMode": "value",
+    "orientation": "horizontal",
+    "justifyMode": "auto",
+    "text": {
+     "titleSize": 13,
+     "valueSize": 22
+    },
+    "wideLayout": true
+   }
+  },
+  {
+   "id": 7,
+   "type": "stat",
+   "title": "Theta / day",
+   "description": "$ per day from time decay",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 8,
+    "y": 7,
+    "w": 4,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"theta\",scenario=\"now\"})",
+     "legendFormat": "Now",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"theta\",scenario=\"after\"})",
+     "legendFormat": "After",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "colorMode": "value",
+    "orientation": "horizontal",
+    "justifyMode": "auto",
+    "text": {
+     "titleSize": 13,
+     "valueSize": 22
+    },
+    "wideLayout": true
+   }
+  },
+  {
+   "id": 8,
+   "type": "stat",
+   "title": "Vega / vol pt",
+   "description": "$ per 1 point of implied vol",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 7,
+    "w": 4,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"vega\",scenario=\"now\"})",
+     "legendFormat": "Now",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"vega\",scenario=\"after\"})",
+     "legendFormat": "After",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "colorMode": "value",
+    "orientation": "horizontal",
+    "justifyMode": "auto",
+    "text": {
+     "titleSize": 13,
+     "valueSize": 22
+    },
+    "wideLayout": true
+   }
+  },
+  {
+   "id": 9,
+   "type": "stat",
+   "title": "Gamma P&L / day",
+   "description": "Expected: what an average day (move from VIX) earns or costs from gamma alone",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 16,
+    "y": 7,
+    "w": 4,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"gamma_pnl_expected\",scenario=\"now\"})",
+     "legendFormat": "Now",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"gamma_pnl_expected\",scenario=\"after\"})",
+     "legendFormat": "After",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "colorMode": "value",
+    "orientation": "horizontal",
+    "justifyMode": "auto",
+    "text": {
+     "titleSize": 13,
+     "valueSize": 22
+    },
+    "wideLayout": true
+   }
+  },
+  {
+   "id": 10,
+   "type": "stat",
+   "title": "Net carry",
+   "description": "Theta / day + expected gamma P&L: positive means being delta neutral pays",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 20,
+    "y": 7,
+    "w": 4,
+    "h": 5
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"net_carry\",scenario=\"now\"})",
+     "legendFormat": "Now",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum(thetagang_pretrade_risk{measure=\"net_carry\",scenario=\"after\"})",
+     "legendFormat": "After",
+     "instant": true,
+     "range": false
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     }
+    },
+    "overrides": []
+   },
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "colorMode": "value",
+    "orientation": "horizontal",
+    "justifyMode": "auto",
+    "text": {
+     "titleSize": 13,
+     "valueSize": 22
+    },
+    "wideLayout": true
+   }
+  },
+  {
+   "id": 11,
+   "type": "table",
+   "title": "Proposed trades",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 12,
+    "w": 14,
+    "h": 9
+   },
+   "description": "Price: net mid per unit (negative is a credit). Cost: qty x price x multiplier.",
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (trade, contracts) (thetagang_pretrade_trade{field=\"qty\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum by (trade, contracts) (thetagang_pretrade_trade{field=\"price\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "C",
+     "expr": "sum by (trade, contracts) (thetagang_pretrade_trade{field=\"cost\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "merge"
+    },
+    {
+     "id": "organize",
+     "options": {
+      "excludeByName": {
+       "Time": true
+      },
+      "indexByName": {
+       "trade": 0,
+       "contracts": 1,
+       "Value #A": 2,
+       "Value #B": 3,
+       "Value #C": 4
+      },
+      "renameByName": {
+       "trade": "Trade",
+       "contracts": "Contracts",
+       "Value #A": "Qty",
+       "Value #B": "Price",
+       "Value #C": "Cost"
+      }
+     }
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Qty"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 0
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Price"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 2
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Cost"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "currencyUSD"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "cellHeight": "sm",
+    "showHeader": true
+   }
+  },
+  {
+   "id": 12,
+   "type": "table",
+   "title": "Stress P&L by SPX move",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 14,
+    "y": 12,
+    "w": 10,
+    "h": 9
+   },
+   "description": "Beta-weighted: each stock moves beta x the SPX move; options repriced at current IV.",
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(sum by (measure, scenario) (thetagang_pretrade_risk{measure=~\"stress_.*\"}), \"row\", \"1\", \"measure\", \"stress_-10%\"), \"row\", \"2\", \"measure\", \"stress_-5%\"), \"row\", \"3\", \"measure\", \"stress_-1%\"), \"row\", \"4\", \"measure\", \"stress_\\\\+1%\"), \"row\", \"5\", \"measure\", \"stress_\\\\+5%\"), \"row\", \"6\", \"measure\", \"stress_\\\\+10%\")",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "groupingToMatrix",
+     "options": {
+      "columnField": "scenario",
+      "rowField": "row",
+      "valueField": "Value"
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "row\\scenario"
+       }
+      ]
+     }
+    },
+    {
+     "id": "calculateField",
+     "options": {
+      "mode": "binary",
+      "binary": {
+       "left": "after",
+       "operator": "-",
+       "right": "now"
+      },
+      "alias": "Change",
+      "replaceFields": false
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "indexByName": {
+       "row\\scenario": 0,
+       "now": 1,
+       "after": 2,
+       "Change": 3
+      },
+      "renameByName": {
+       "row\\scenario": "SPX move",
+       "now": "Now",
+       "after": "After"
+      }
+     }
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     },
+     "custom": {
+      "align": "center",
+      "cellOptions": {
+       "type": "color-text"
+      }
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "SPX move"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "auto"
+        }
+       },
+       {
+        "id": "custom.align",
+        "value": "left"
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "1": {
+            "text": "-10%",
+            "index": 0
+           },
+           "2": {
+            "text": "-5%",
+            "index": 1
+           },
+           "3": {
+            "text": "-1%",
+            "index": 2
+           },
+           "4": {
+            "text": "+1%",
+            "index": 3
+           },
+           "5": {
+            "text": "+5%",
+            "index": 4
+           },
+           "6": {
+            "text": "+10%",
+            "index": 5
+           }
+          }
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "cellHeight": "sm"
+   }
+  }
+ ],
+ "links": [
+  {
+   "title": "thetagang",
+   "type": "link",
+   "url": "/d/thetagang",
+   "icon": "dashboard"
+  }
+ ]
+}

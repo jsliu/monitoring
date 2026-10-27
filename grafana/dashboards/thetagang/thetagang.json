@@ -91,7 +91,9 @@
     "wideLayout": true
    },
    "timeFrom": "24h",
-   "hideTimeOverride": true
+   "hideTimeOverride": true,
+   "interval": "1m",
+   "maxDataPoints": 1500
   },
   {
    "id": 2,
@@ -159,7 +161,9 @@
     "wideLayout": true
    },
    "timeFrom": "24h",
-   "hideTimeOverride": true
+   "hideTimeOverride": true,
+   "interval": "1m",
+   "maxDataPoints": 1500
   },
   {
    "id": 39,
@@ -227,7 +231,9 @@
     "h": 5
    },
    "timeFrom": "24h",
-   "hideTimeOverride": true
+   "hideTimeOverride": true,
+   "interval": "1m",
+   "maxDataPoints": 1500
   },
   {
    "id": 19,
@@ -295,7 +301,9 @@
     "h": 5
    },
    "timeFrom": "24h",
-   "hideTimeOverride": true
+   "hideTimeOverride": true,
+   "interval": "1m",
+   "maxDataPoints": 1500
   },
   {
    "id": 3,
@@ -448,7 +456,9 @@
       ]
      }
     }
-   ]
+   ],
+   "interval": "1m",
+   "maxDataPoints": 1500
   },
   {
    "id": 43,
@@ -601,7 +611,9 @@
       ]
      }
     }
-   ]
+   ],
+   "interval": "1m",
+   "maxDataPoints": 1500
   },
   {
    "id": 4,
@@ -669,7 +681,9 @@
     "wideLayout": true
    },
    "timeFrom": "24h",
-   "hideTimeOverride": true
+   "hideTimeOverride": true,
+   "interval": "1m",
+   "maxDataPoints": 1500
   },
   {
    "id": 5,
@@ -737,7 +751,9 @@
     "wideLayout": true
    },
    "timeFrom": "24h",
-   "hideTimeOverride": true
+   "hideTimeOverride": true,
+   "interval": "1m",
+   "maxDataPoints": 1500
   },
   {
    "id": 28,
@@ -805,7 +821,9 @@
     "wideLayout": true
    },
    "timeFrom": "24h",
-   "hideTimeOverride": true
+   "hideTimeOverride": true,
+   "interval": "1m",
+   "maxDataPoints": 1500
   },
   {
    "id": 6,
@@ -996,7 +1014,7 @@
      },
      "refId": "E",
      "expr": "sum(thetagang_account_value{field=\"maint_margin\"})",
-     "legendFormat": "Maintenance margin",
+     "legendFormat": "Maint. margin",
      "instant": true,
      "range": false
     },
@@ -1050,13 +1068,14 @@
     "graphMode": "none",
     "textMode": "value_and_name",
     "justifyMode": "center",
-    "wideLayout": true
+    "wideLayout": true,
+    "orientation": "auto"
    },
    "gridPos": {
     "x": 0,
     "y": 11,
     "w": 8,
-    "h": 5
+    "h": 6
    }
   },
   {
@@ -1127,7 +1146,7 @@
     "x": 8,
     "y": 11,
     "w": 4,
-    "h": 5
+    "h": 6
    }
   },
   {
@@ -1198,7 +1217,7 @@
     "x": 12,
     "y": 11,
     "w": 4,
-    "h": 5
+    "h": 6
    }
   },
   {
@@ -1214,7 +1233,7 @@
     "x": 16,
     "y": 11,
     "w": 4,
-    "h": 5
+    "h": 6
    },
    "targets": [
     {
@@ -1288,7 +1307,7 @@
     "x": 20,
     "y": 11,
     "w": 4,
-    "h": 5
+    "h": 6
    },
    "targets": [
     {
@@ -1350,7 +1369,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 16,
+    "y": 17,
     "w": 24,
     "h": 1
    },
@@ -1361,8 +1380,8 @@
   {
    "id": 20,
    "type": "table",
-   "title": "Portfolio greeks (SPX beta-weighted)",
-   "description": "now: current book. after_proposals: after the SPX delta = 0 net target trades (display only). after_trades: after the trade plan (only while the trading strategy runs).",
+   "title": "Portfolio greeks: now and after each plan",
+   "description": "SPX beta-weighted, now and after each way to SPX delta 0 (see Trade plan below). Way 1: now + the new trades (blank while the trading strategy isn't running). Way 2: now + the resizes of what you hold.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -1374,7 +1393,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "sum by (greek, scenario) (thetagang_greeks) or label_replace(sum by (greek) (thetagang_greeks_after_trades), \"scenario\", \"after_trades\", \"\", \"\")",
+     "expr": "sum by (greek, scenario) (thetagang_greeks) or label_replace(sum by (greek) (thetagang_greeks{scenario=\"now\"}) + on (greek) sum by (greek) (thetagang_plan_greeks_change), \"scenario\", \"after_trades\", \"\", \"\")",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -1459,13 +1478,13 @@
       "indexByName": {
        "greek\\scenario": 0,
        "now": 1,
-       "after_proposals": 2,
-       "after_trades": 3
+       "after_trades": 2,
+       "after_proposals": 3
       },
       "renameByName": {
        "greek\\scenario": "Greek",
-       "after_proposals": "After proposals",
-       "after_trades": "After trades",
+       "after_proposals": "After way 2 (resize held)",
+       "after_trades": "After way 1 (new trades)",
        "now": "Now"
       },
       "excludeByName": {
@@ -1476,8 +1495,8 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 17,
-    "w": 8,
+    "y": 18,
+    "w": 12,
     "h": 11
    }
   },
@@ -1491,9 +1510,9 @@
     "uid": "prometheus"
    },
    "gridPos": {
-    "x": 8,
-    "y": 17,
-    "w": 8,
+    "x": 12,
+    "y": 18,
+    "w": 12,
     "h": 11
    },
    "targets": [
@@ -1503,7 +1522,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "label_replace(label_replace(label_replace(label_replace(sum by (move, betas) (thetagang_stress_pnl), \"row\", \"1\", \"move\", \"-10%\"), \"row\", \"2\", \"move\", \"-5%\"), \"row\", \"3\", \"move\", \"\\\\+5%\"), \"row\", \"4\", \"move\", \"\\\\+10%\")",
+     "expr": "label_replace(label_replace(label_replace(label_replace(label_replace(label_replace(sum by (move, betas) (thetagang_stress_pnl), \"row\", \"1\", \"move\", \"-10%\"), \"row\", \"2\", \"move\", \"-5%\"), \"row\", \"3\", \"move\", \"-1%\"), \"row\", \"4\", \"move\", \"\\\\+1%\"), \"row\", \"5\", \"move\", \"\\\\+5%\"), \"row\", \"6\", \"move\", \"\\\\+10%\")",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -1533,8 +1552,7 @@
      "custom": {
       "align": "center",
       "cellOptions": {
-       "type": "color-background",
-       "mode": "gradient"
+       "type": "color-text"
       },
       "minWidth": 100
      }
@@ -1571,12 +1589,20 @@
             "index": 1
            },
            "3": {
-            "text": "+5%",
+            "text": "-1%",
             "index": 2
            },
            "4": {
-            "text": "+10%",
+            "text": "+1%",
             "index": 3
+           },
+           "5": {
+            "text": "+5%",
+            "index": 4
+           },
+           "6": {
+            "text": "+10%",
+            "index": 5
            }
           }
          }
@@ -1723,13 +1749,17 @@
     "graphMode": "none",
     "textMode": "value_and_name",
     "justifyMode": "center",
-    "orientation": "horizontal"
+    "orientation": "vertical",
+    "text": {
+     "titleSize": 13,
+     "valueSize": 24
+    }
    },
    "gridPos": {
-    "x": 16,
-    "y": 17,
-    "w": 4,
-    "h": 11
+    "x": 0,
+    "y": 29,
+    "w": 16,
+    "h": 4
    }
   },
   {
@@ -1781,10 +1811,629 @@
     }
    ],
    "gridPos": {
-    "x": 20,
-    "y": 17,
-    "w": 4,
-    "h": 11
+    "x": 16,
+    "y": 29,
+    "w": 8,
+    "h": 4
+   }
+  },
+  {
+   "id": 37,
+   "type": "row",
+   "title": "Trade plan",
+   "collapsed": false,
+   "panels": [],
+   "gridPos": {
+    "x": 0,
+    "y": 33,
+    "w": 24,
+    "h": 1
+   }
+  },
+  {
+   "id": 50,
+   "type": "table",
+   "title": "Way 1 \u2014 New trades: open the [[strategy.trades]]",
+   "description": "Brings SPX delta to 0 by opening your [[strategy.trades]], sized together. Active when place_target_orders = false. From the trading strategy (every 5 min, while it runs). Order: side, quantity, contract per leg (a spread is one combo); limit = net mid per unit (negative = credit); cost: red you pay, green you receive.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "label_replace(sum by (trade, contracts, note) (thetagang_plan_units), \"status\", \"active\", \"\", \"\")",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum by (trade) (thetagang_plan_unit_spx_delta)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "C",
+     "expr": "sum by (trade) (thetagang_plan_price)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "D",
+     "expr": "sum by (trade) (thetagang_plan_cost)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "noValue": "No new trades: the trading strategy isn't running, place_target_orders = true, no [[strategy.trades]], or no plan this run (betas loading, positions without greeks, within the band)"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Units"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 0
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "SPX \u0394 / unit"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 3
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Status"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "active": {
+            "text": "active",
+            "color": "green",
+            "index": 0
+           },
+           "preview": {
+            "text": "preview",
+            "color": "#8e8e8e",
+            "index": 1
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 90
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Limit (net mid)"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "custom.width",
+        "value": 120
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Cost"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "currencyUSD"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       },
+       {
+        "id": "thresholds",
+        "value": {
+         "mode": "absolute",
+         "steps": [
+          {
+           "color": "green",
+           "value": null
+          },
+          {
+           "color": "red",
+           "value": 0.5
+          }
+         ]
+        }
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "thresholds"
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Order (enter at the limit)"
+      },
+      "properties": [
+       {
+        "id": "custom.minWidth",
+        "value": 380
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Units"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 70
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "SPX \u0394 / unit"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 100
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Note"
+      },
+      "properties": [
+       {
+        "id": "noValue",
+        "value": " "
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "cellHeight": "sm",
+    "showHeader": true
+   },
+   "transformations": [
+    {
+     "id": "joinByField",
+     "options": {
+      "byField": "trade",
+      "mode": "outer"
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "excludeByName": {
+       "Time": true,
+       "Time 1": true,
+       "Time 2": true,
+       "Time 3": true,
+       "Time 4": true,
+       "trade": true,
+       "plan": true
+      },
+      "indexByName": {
+       "status": 0,
+       "contracts": 1,
+       "Value #C": 2,
+       "Value #D": 3,
+       "Value #A": 4,
+       "Value #B": 5,
+       "note": 6
+      },
+      "renameByName": {
+       "plan": "Plan",
+       "status": "Status",
+       "contracts": "Order (enter at the limit)",
+       "Value #C": "Limit (net mid)",
+       "Value #D": "Cost",
+       "Value #A": "Units",
+       "Value #B": "SPX \u0394 / unit",
+       "note": "Note"
+      }
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "Order (enter at the limit)"
+       }
+      ]
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 0,
+    "y": 34,
+    "w": 24,
+    "h": 4
+   }
+  },
+  {
+   "id": 45,
+   "type": "table",
+   "title": "Way 2 \u2014 Resize held: adjust what you already hold (place_target_orders)",
+   "description": "Brings SPX delta toward 0 by resizing each symbol's position toward its target (shares, one option, or a whole vertical). Active when place_target_orders = true, otherwise a preview for comparison. Never adds short options (held back as 'by hand'), skips symbols with open orders and index options. From the monitor (every minute).",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (trade, contracts, note, status) (thetagang_target_plan_units)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum by (trade) (thetagang_target_plan_unit_spx_delta)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "C",
+     "expr": "sum by (trade) (thetagang_target_plan_price)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "D",
+     "expr": "sum by (trade) (thetagang_target_plan_cost)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "noValue": "Nothing to resize"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Units"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 0
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "SPX \u0394 / unit"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 3
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Status"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "active": {
+            "text": "active",
+            "color": "green",
+            "index": 0
+           },
+           "preview": {
+            "text": "preview",
+            "color": "#8e8e8e",
+            "index": 1
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 90
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Limit (net mid)"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "custom.width",
+        "value": 120
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Cost"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "currencyUSD"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       },
+       {
+        "id": "thresholds",
+        "value": {
+         "mode": "absolute",
+         "steps": [
+          {
+           "color": "green",
+           "value": null
+          },
+          {
+           "color": "red",
+           "value": 0.5
+          }
+         ]
+        }
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "thresholds"
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Order (enter at the limit)"
+      },
+      "properties": [
+       {
+        "id": "custom.minWidth",
+        "value": 380
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Units"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 70
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "SPX \u0394 / unit"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 100
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Note"
+      },
+      "properties": [
+       {
+        "id": "noValue",
+        "value": " "
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "cellHeight": "sm",
+    "showHeader": true
+   },
+   "transformations": [
+    {
+     "id": "joinByField",
+     "options": {
+      "byField": "trade",
+      "mode": "outer"
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "excludeByName": {
+       "Time": true,
+       "Time 1": true,
+       "Time 2": true,
+       "Time 3": true,
+       "Time 4": true,
+       "trade": true,
+       "plan": true
+      },
+      "indexByName": {
+       "status": 0,
+       "contracts": 1,
+       "Value #C": 2,
+       "Value #D": 3,
+       "Value #A": 4,
+       "Value #B": 5,
+       "note": 6
+      },
+      "renameByName": {
+       "plan": "Plan",
+       "status": "Status",
+       "contracts": "Order (enter at the limit)",
+       "Value #C": "Limit (net mid)",
+       "Value #D": "Cost",
+       "Value #A": "Units",
+       "Value #B": "SPX \u0394 / unit",
+       "note": "Note"
+      }
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "Order (enter at the limit)"
+       }
+      ]
+     }
+    }
+   ],
+   "gridPos": {
+    "x": 0,
+    "y": 38,
+    "w": 24,
+    "h": 12
    }
   },
   {
@@ -1795,7 +2444,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 28,
+    "y": 50,
     "w": 24,
     "h": 1
    },
@@ -1814,7 +2463,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 29,
+    "y": 51,
     "w": 14,
     "h": 11
    },
@@ -1943,7 +2592,7 @@
    },
    "gridPos": {
     "x": 14,
-    "y": 29,
+    "y": 51,
     "w": 10,
     "h": 11
    }
@@ -2463,9 +3112,9 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 40,
+    "y": 62,
     "w": 24,
-    "h": 27
+    "h": 25
    }
   },
   {
@@ -2479,9 +3128,9 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 67,
+    "y": 87,
     "w": 24,
-    "h": 26
+    "h": 25
    },
    "targets": [
     {
@@ -2945,7 +3594,7 @@
    "id": 24,
    "type": "table",
    "title": "Positions summary and SPX \u0394=0 targets",
-   "description": "Targets for SPX delta = 0 and delta $ (no beta) = 0 (weighted least squares). Weight = |beta delta $| / sum of |beta delta $|; side = market side. Net target contracts resizes the position with the most delta, whole contracts, never flipping a position. Display only: no orders.",
+   "description": "Per symbol: what you hold, and the target that makes SPX delta 0. 'Net target contracts' is the trade toward it: placed by the strategy only with place_target_orders = true (then it's in the Trade plan), otherwise for reference.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -3357,9 +4006,9 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 93,
+    "y": 112,
     "w": 24,
-    "h": 26
+    "h": 25
    }
   },
   {
@@ -3370,7 +4019,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 119,
+    "y": 137,
     "w": 24,
     "h": 1
    },
@@ -3451,9 +4100,9 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 120,
+    "y": 138,
     "w": 24,
-    "h": 15
+    "h": 14
    },
    "transformations": [
     {
@@ -3485,14 +4134,14 @@
        "action": "Action"
       },
       "indexByName": {
-       "Contract": 0,
-       "Side": 1,
-       "Qty": 2,
-       "DTE": 3,
-       "Delta": 4,
-       "P&L": 5,
-       "Take profit at": 6,
-       "Action": 7
+       "name": 0,
+       "side": 1,
+       "Value #A": 2,
+       "Value #B": 3,
+       "Value #C": 4,
+       "Value #D": 5,
+       "take_profit": 6,
+       "action": 7
       }
      }
     },
@@ -3657,7 +4306,7 @@
          {
           "type": "regex",
           "options": {
-           "pattern": "(?i).*by hand.*",
+           "pattern": "/.*by hand.*/i",
            "result": {
             "color": "yellow",
             "index": 0
@@ -3788,9 +4437,9 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 135,
+    "y": 152,
     "w": 24,
-    "h": 16
+    "h": 15
    },
    "transformations": [
     {
@@ -3822,14 +4471,14 @@
        "action": "Action"
       },
       "indexByName": {
-       "Contract": 0,
-       "Side": 1,
-       "Qty": 2,
-       "DTE": 3,
-       "Delta": 4,
-       "P&L": 5,
-       "Take profit at": 6,
-       "Action": 7
+       "name": 0,
+       "side": 1,
+       "Value #A": 2,
+       "Value #B": 3,
+       "Value #C": 4,
+       "Value #D": 5,
+       "take_profit": 6,
+       "action": 7
       }
      }
     },
@@ -3994,7 +4643,7 @@
          {
           "type": "regex",
           "options": {
-           "pattern": "(?i).*by hand.*",
+           "pattern": "/.*by hand.*/i",
            "result": {
             "color": "yellow",
             "index": 0
@@ -4113,9 +4762,9 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 151,
+    "y": 167,
     "w": 24,
-    "h": 12
+    "h": 11
    },
    "transformations": [
     {
@@ -4146,13 +4795,13 @@
        "action": "Action"
       },
       "indexByName": {
-       "Spread": 0,
-       "Type": 1,
-       "Qty": 2,
-       "DTE": 3,
-       "P&L": 4,
-       "Take profit at": 5,
-       "Action": 6
+       "name": 0,
+       "side": 1,
+       "Value #A": 2,
+       "Value #B": 3,
+       "Value #C": 4,
+       "take_profit": 5,
+       "action": 6
       }
      }
     },
@@ -4289,7 +4938,7 @@
          {
           "type": "regex",
           "options": {
-           "pattern": "(?i).*by hand.*",
+           "pattern": "/.*by hand.*/i",
            "result": {
             "color": "yellow",
             "index": 0
@@ -4355,7 +5004,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 163,
+    "y": 178,
     "w": 24,
     "h": 1
    },
@@ -4374,9 +5023,9 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 164,
+    "y": 179,
     "w": 24,
-    "h": 46
+    "h": 45
    },
    "targets": [
     {
@@ -4902,196 +5551,6 @@
    ]
   },
   {
-   "id": 37,
-   "type": "row",
-   "title": "Trade plan",
-   "collapsed": false,
-   "panels": [],
-   "gridPos": {
-    "x": 0,
-    "y": 210,
-    "w": 24,
-    "h": 1
-   },
-   "fieldConfig": {
-    "overrides": []
-   }
-  },
-  {
-   "id": 26,
-   "type": "table",
-   "title": "Trade plan (configured trades, sized to SPX \u0394=0)",
-   "description": "Published by the trading strategy each run (empty while it isn't running). Contracts: whole units, never the wrong way, capped by max_contracts.",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "sum by (trade, contracts, note) (thetagang_plan_units)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "B",
-     "expr": "sum by (trade) (thetagang_plan_unit_spx_delta)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {},
-    "overrides": [
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "SPX \u0394 / unit"
-      },
-      "properties": [
-       {
-        "id": "displayName",
-        "value": "SPX \u0394 / unit"
-       },
-       {
-        "id": "decimals",
-        "value": 3
-       },
-       {
-        "id": "thresholds",
-        "value": {
-         "mode": "absolute",
-         "steps": [
-          {
-           "color": "red",
-           "value": null
-          },
-          {
-           "color": "green",
-           "value": 0
-          }
-         ]
-        }
-       },
-       {
-        "id": "color",
-        "value": {
-         "mode": "thresholds"
-        }
-       },
-       {
-        "id": "custom.cellOptions",
-        "value": {
-         "type": "color-text"
-        }
-       }
-      ]
-     }
-    ]
-   },
-   "options": {
-    "cellHeight": "sm"
-   },
-   "transformations": [
-    {
-     "id": "joinByField",
-     "options": {
-      "byField": "trade",
-      "mode": "outer"
-     }
-    },
-    {
-     "id": "filterFieldsByName",
-     "options": {
-      "include": {
-       "pattern": "^(?!(Time.*)$).*$"
-      }
-     }
-    },
-    {
-     "id": "organize",
-     "options": {
-      "renameByName": {
-       "Value #A": "Open",
-       "Value #B": "SPX \u0394 / unit",
-       "trade": "Trade",
-       "contracts": "Contracts",
-       "note": "Note"
-      }
-     }
-    }
-   ],
-   "gridPos": {
-    "x": 0,
-    "y": 211,
-    "w": 16,
-    "h": 4
-   }
-  },
-  {
-   "id": 27,
-   "type": "table",
-   "title": "Trade plan status",
-   "description": "Why the plan is what it is: within the band, positions without greeks, rolls this run, or SPX delta now -> after.",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "sum by (status) (thetagang_plan_status)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {},
-    "overrides": []
-   },
-   "options": {
-    "cellHeight": "sm"
-   },
-   "transformations": [
-    {
-     "id": "organize",
-     "options": {
-      "excludeByName": {
-       "Time": true,
-       "Value": true
-      },
-      "renameByName": {
-       "status": "Status"
-      }
-     }
-    }
-   ],
-   "gridPos": {
-    "x": 16,
-    "y": 211,
-    "w": 8,
-    "h": 4
-   }
-  },
-  {
    "id": 38,
    "type": "row",
    "title": "Activity",
@@ -5099,7 +5558,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 215,
+    "y": 224,
     "w": 24,
     "h": 1
    },
@@ -5118,7 +5577,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 216,
+    "y": 225,
     "w": 12,
     "h": 8
    },
@@ -5199,7 +5658,7 @@
    },
    "gridPos": {
     "x": 12,
-    "y": 216,
+    "y": 225,
     "w": 12,
     "h": 8
    },

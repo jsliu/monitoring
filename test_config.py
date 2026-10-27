@@ -26,7 +26,7 @@ def _rules():
 
 def test_every_provisioning_file_and_dashboard_parses_as_json():
     files = [p for p in GRAFANA.rglob("*") if p.is_file() and p.name != "contact-point.yaml"]  # that one is generated
-    assert len(files) == 6 and all(isinstance(_json(p), dict) for p in files)
+    assert len(files) == 7 and all(isinstance(_json(p), dict) for p in files)
 
 
 def test_each_project_has_its_own_grafana_folder():
@@ -162,8 +162,10 @@ def test_fit_sizes_tables_to_their_rows_and_restacks_the_bands():
     import fit_tables as ft
 
     assert ft.table_height(0) == ft.MIN_H and ft.table_height(40) > ft.table_height(10)
-    rows_px = ft.GRID_PX * ft.table_height(12) - 8
-    assert rows_px >= ft.CHROME_PX + ft.ROW_PX * 12  # all 12 rows fit
+    for cell, row_px in ft.ROW_PX.items():
+        panel_px = ft.GRID_PX * ft.table_height(12, cell) - ft.GAP_PX
+        needed = ft.CHROME_PX + row_px * 12
+        assert needed <= panel_px < needed + ft.GRID_PX  # all 12 rows fit, < 1 row spare
     panels = [
         {"type": "row", "gridPos": {"x": 0, "y": 0, "w": 24, "h": 1}},
         {"type": "table", "gridPos": {"x": 0, "y": 1, "w": 12, "h": 9}},
@@ -179,6 +181,16 @@ def test_thetagang_transforms_are_ones_grafana_knows():
     """Grafana silently skips an unknown transform id (configFromQuery is really configFromData)."""
     known = {"configFromData", "filterFieldsByName", "groupingToMatrix", "joinByField", "merge", "organize",
              "rowsToFields", "sortBy", "calculateField", "reduce", "seriesToRows", "labelsToFields"}
-    dashboard = _json(GRAFANA / "dashboards" / "thetagang" / "thetagang.json")
-    used = {t["id"] for p in dashboard["panels"] for t in p.get("transformations", [])}
-    assert used <= known, used - known
+    for path in (GRAFANA / "dashboards" / "thetagang").glob("*.json"):
+        used = {t["id"] for p in _json(path)["panels"] for t in p.get("transformations", [])}
+        assert used <= known, (path.name, used - known)
+
+
+def test_thetagang_regexes_are_javascript():
+    """Grafana runs mapping and field-name regexes in the browser: an inline flag like (?i) is Python/Go only and
+    crashes the whole table (write /pattern/i instead)."""
+    import re as _re
+
+    for path in (GRAFANA / "dashboards" / "thetagang").glob("*.json"):
+        bad = _re.findall(r'"pattern": "([^"]*\(\?[imsx][^"]*)"', path.read_text())
+        assert not bad, (path.name, bad)

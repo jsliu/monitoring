@@ -18,16 +18,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 DASHBOARDS = sorted((ROOT / "grafana" / "dashboards" / "thetagang").glob("*.json"))
 PROMETHEUS = "http://127.0.0.1:9090"
-# Grafana's grid: a unit is 30 px plus an 8 px gap; a "sm" table row is 36 px,
-# and the panel title, header row and padding take about 100 px
-GRID_PX, ROW_PX, CHROME_PX = 38, 36, 100
-SPARE_ROWS = 1  # one empty row of headroom, so a new position doesn't scroll at once
+# Grafana's grid: h units are 38 * h - 8 px (30 px each, 8 px gaps). Measured on
+# the dashboard: the title and padding above the header take 39 px, the header
+# row 36, the bottom padding 8; a body row is 36 px ("sm"), 42 ("md"), 48 ("lg").
+# Run ./run.sh fit again when the number of positions changes.
+GRID_PX, GAP_PX, CHROME_PX = 38, 8, 39 + 36 + 8 + 4  # +4: never a 1 px scrollbar
+ROW_PX = {"sm": 36, "md": 42, "lg": 48}
 MIN_H = 4
 
 
-def table_height(rows: int) -> int:
-    """Grid units that show `rows` table rows without a scrollbar."""
-    return max(MIN_H, math.ceil((CHROME_PX + ROW_PX * (rows + SPARE_ROWS)) / GRID_PX))
+def table_height(rows: int, cell_height: str = "sm") -> int:
+    """Grid units that show `rows` table rows without a scrollbar or spare space."""
+    px = CHROME_PX + ROW_PX.get(cell_height, 36) * rows
+    return max(MIN_H, math.ceil((px + GAP_PX) / GRID_PX))
 
 
 def query(expr: str) -> list[dict]:
@@ -82,8 +85,12 @@ def fit(path: Path, dry_run: bool) -> None:
     for panel in dashboard["panels"]:
         if panel["type"] == "table":
             rows = row_count(panel)
+            if not rows:  # no data now (process down, nothing proposed): keep the height
+                print(f"  {panel['title'][:58]:58}   - no data, h {panel['gridPos']['h']} kept")
+                continue
             footer = panel.get("options", {}).get("footer", {}).get("show", False)
-            panel["gridPos"]["h"] = table_height(rows + footer)
+            cell = panel.get("options", {}).get("cellHeight", "sm")
+            panel["gridPos"]["h"] = table_height(rows + footer, cell)
             print(f"  {panel['title'][:58]:58} {rows:3} rows -> h {panel['gridPos']['h']}")
     restack(dashboard["panels"])
     if not dry_run:
