@@ -829,7 +829,7 @@
    "id": 6,
    "type": "stat",
    "title": "Gamma P&L / day",
-   "description": "Realized: gamma's share of today's P&L so far (the attribution table's Gamma column). Expected: what an average day earns (+) or costs (-) from gamma alone, 1/2 x gamma x (move x SPX)^2, with the move from VIX (VIX / sqrt(252), about 1% at VIX 16): the expected P&L of staying delta neutral (negative when short gamma). Net carry: Theta / day + Expected: positive means being delta neutral pays you. Break-even: the daily SPX move where gamma's loss equals a day's theta.",
+   "description": "Realized: gamma's share of today's P&L so far (the attribution table's Gamma column). Expected: what an average day earns (+) or costs (-) from gamma alone, 1/2 x gamma x (move x SPX)^2, with the move from VIX (VIX / sqrt(252), about 1% at VIX 16): the expected P&L of staying delta neutral (negative when short gamma). Net carry: Theta / day + Expected: positive means being delta neutral pays you. Break-even (max): short gamma, the biggest daily SPX move a day's theta pays for; bigger days lose. Break-even (min): long gamma, the smallest move that earns back a day's theta; smaller days lose.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -881,7 +881,7 @@
      },
      "refId": "B",
      "expr": "thetagang_breakeven_move",
-     "legendFormat": "Break-even",
+     "legendFormat": "Break-even ({{kind}})",
      "instant": true,
      "range": false
     }

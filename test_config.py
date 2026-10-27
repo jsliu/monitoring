@@ -180,7 +180,7 @@ def test_fit_sizes_tables_to_their_rows_and_restacks_the_bands():
 def test_thetagang_transforms_are_ones_grafana_knows():
     """Grafana silently skips an unknown transform id (configFromQuery is really configFromData)."""
     known = {"configFromData", "filterFieldsByName", "groupingToMatrix", "joinByField", "merge", "organize",
-             "rowsToFields", "sortBy", "calculateField", "reduce", "seriesToRows", "labelsToFields"}
+             "rowsToFields", "sortBy", "calculateField", "convertFieldType", "reduce", "seriesToRows", "labelsToFields"}
     for path in (GRAFANA / "dashboards" / "thetagang").glob("*.json"):
         used = {t["id"] for p in _json(path)["panels"] for t in p.get("transformations", [])}
         assert used <= known, (path.name, used - known)
