@@ -554,7 +554,7 @@
             "window": "thetagang"
           },
           "annotations": {
-            "summary": "SPX delta has been outside delta_band for an hour with trading on: the hedge isn't happening (trades blocked or capped)."
+            "summary": "Beta delta $ has been outside the SPX delta neutral band for an hour with trading on: the hedge isn't happening (trades blocked or capped)."
           },
           "data": [
             {
@@ -566,7 +566,7 @@
               "datasourceUid": "prometheus",
               "model": {
                 "refId": "A",
-                "expr": "(abs(max(thetagang_spx_delta)) - max(thetagang_strategy_delta_band)) * (1 - max(thetagang_strategy_dry_run))",
+                "expr": "(abs(max(thetagang_beta_delta_dollars)) - max(thetagang_delta_band_dollars)) * (1 - max(thetagang_strategy_dry_run))",
                 "instant": true
               }
             },

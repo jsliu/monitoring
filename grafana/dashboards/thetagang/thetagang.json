@@ -301,7 +301,7 @@
    "id": 3,
    "type": "stat",
    "title": "SPX delta",
-   "description": "Beta-weighted; one axis, SPX units",
+   "description": "Beta-weighted; one axis, SPX units. Green: SPX delta neutral (|beta delta $| within the band: a 1% SPX day costs at most delta_band_theta_days of theta, capped at delta_band_nav_pct of net liq). Orange: up to twice the band. Red: beyond.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -323,6 +323,17 @@
      "legendFormat": "SPX delta",
      "instant": false,
      "range": true
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "label_replace((sum(thetagang_delta_band_dollars) / sum(thetagang_spx_price)) * 0 - 1e15, \"step\", \"base\", \"\", \"\")\n or label_replace(-2 * (sum(thetagang_delta_band_dollars) / sum(thetagang_spx_price)), \"step\", \"lo2\", \"\", \"\")\n or label_replace(-1 * (sum(thetagang_delta_band_dollars) / sum(thetagang_spx_price)), \"step\", \"lo1\", \"\", \"\")\n or label_replace(1 * (sum(thetagang_delta_band_dollars) / sum(thetagang_spx_price)), \"step\", \"hi1\", \"\", \"\")\n or label_replace(2 * (sum(thetagang_delta_band_dollars) / sum(thetagang_spx_price)), \"step\", \"hi2\", \"\", \"\")",
+     "instant": true,
+     "range": false,
+     "format": "table"
     }
    ],
    "fieldConfig": {
@@ -336,12 +347,8 @@
       "mode": "absolute",
       "steps": [
        {
-        "color": "red",
+        "color": "text",
         "value": null
-       },
-       {
-        "color": "green",
-        "value": 0
        }
       ]
      }
@@ -363,13 +370,91 @@
     "wideLayout": true
    },
    "timeFrom": "24h",
-   "hideTimeOverride": true
+   "hideTimeOverride": true,
+   "transformations": [
+    {
+     "id": "rowsToFields",
+     "options": {
+      "mappings": [
+       {
+        "fieldName": "Time",
+        "handlerKey": "__ignore"
+       },
+       {
+        "fieldName": "step",
+        "handlerKey": "field.name"
+       },
+       {
+        "fieldName": "Value",
+        "handlerKey": "field.value"
+       }
+      ]
+     }
+    },
+    {
+     "id": "configFromData",
+     "options": {
+      "configRefId": "rowsToFields-B",
+      "applyTo": {
+       "id": "byType",
+       "options": "number"
+      },
+      "mappings": [
+       {
+        "fieldName": "base",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "red"
+         }
+        }
+       },
+       {
+        "fieldName": "lo2",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "orange"
+         }
+        }
+       },
+       {
+        "fieldName": "lo1",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "green"
+         }
+        }
+       },
+       {
+        "fieldName": "hi1",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "orange"
+         }
+        }
+       },
+       {
+        "fieldName": "hi2",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "red"
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
   },
   {
    "id": 43,
    "type": "stat",
    "title": "Beta delta $",
-   "description": "Portfolio delta $ x beta: SPX delta x SPX price. +1% SPX \u2248 1% of this",
+   "description": "Portfolio delta $ x beta: SPX delta x SPX price. +1% SPX \u2248 1% of this. Green: SPX delta neutral (|beta delta $| within the band: a 1% SPX day costs at most delta_band_theta_days of theta, capped at delta_band_nav_pct of net liq). Orange: up to twice the band. Red: beyond.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -391,6 +476,17 @@
      "legendFormat": "beta delta $",
      "instant": false,
      "range": true
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "label_replace(sum(thetagang_delta_band_dollars) * 0 - 1e15, \"step\", \"base\", \"\", \"\")\n or label_replace(-2 * sum(thetagang_delta_band_dollars), \"step\", \"lo2\", \"\", \"\")\n or label_replace(-1 * sum(thetagang_delta_band_dollars), \"step\", \"lo1\", \"\", \"\")\n or label_replace(1 * sum(thetagang_delta_band_dollars), \"step\", \"hi1\", \"\", \"\")\n or label_replace(2 * sum(thetagang_delta_band_dollars), \"step\", \"hi2\", \"\", \"\")",
+     "instant": true,
+     "range": false,
+     "format": "table"
     }
    ],
    "fieldConfig": {
@@ -404,12 +500,8 @@
       "mode": "absolute",
       "steps": [
        {
-        "color": "red",
+        "color": "text",
         "value": null
-       },
-       {
-        "color": "green",
-        "value": 0
        }
       ]
      }
@@ -431,7 +523,85 @@
     "wideLayout": true
    },
    "timeFrom": "24h",
-   "hideTimeOverride": true
+   "hideTimeOverride": true,
+   "transformations": [
+    {
+     "id": "rowsToFields",
+     "options": {
+      "mappings": [
+       {
+        "fieldName": "Time",
+        "handlerKey": "__ignore"
+       },
+       {
+        "fieldName": "step",
+        "handlerKey": "field.name"
+       },
+       {
+        "fieldName": "Value",
+        "handlerKey": "field.value"
+       }
+      ]
+     }
+    },
+    {
+     "id": "configFromData",
+     "options": {
+      "configRefId": "rowsToFields-B",
+      "applyTo": {
+       "id": "byType",
+       "options": "number"
+      },
+      "mappings": [
+       {
+        "fieldName": "base",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "red"
+         }
+        }
+       },
+       {
+        "fieldName": "lo2",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "orange"
+         }
+        }
+       },
+       {
+        "fieldName": "lo1",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "green"
+         }
+        }
+       },
+       {
+        "fieldName": "hi1",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "orange"
+         }
+        }
+       },
+       {
+        "fieldName": "hi2",
+        "handlerKey": "threshold1",
+        "handlerArguments": {
+         "threshold": {
+          "color": "red"
+         }
+        }
+       }
+      ]
+     }
+    }
+   ]
   },
   {
    "id": 4,
@@ -640,8 +810,8 @@
   {
    "id": 6,
    "type": "stat",
-   "title": "Gamma",
-   "description": "SPX delta change per SPX point",
+   "title": "Gamma P&L / day",
+   "description": "Realized: gamma's share of today's P&L so far (the attribution table's Gamma column). Expected: what an average day earns (+) or costs (-) from gamma alone, 1/2 x gamma x (move x SPX)^2, with the move from VIX (VIX / sqrt(252), about 1% at VIX 16): the expected P&L of staying delta neutral (negative when short gamma). Net carry: Theta / day + Expected: positive means being delta neutral pays you. Break-even: the daily SPX move where gamma's loss equals a day's theta.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -658,17 +828,50 @@
       "type": "prometheus",
       "uid": "prometheus"
      },
+     "refId": "T",
+     "expr": "sum(thetagang_symbol_pnl{part=\"gamma\"})",
+     "legendFormat": "Realized",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
      "refId": "A",
-     "expr": "thetagang_gamma_spx",
-     "legendFormat": "",
-     "instant": false,
-     "range": true
+     "expr": "thetagang_gamma_pnl_expected",
+     "legendFormat": "Expected",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "C",
+     "expr": "thetagang_net_carry",
+     "legendFormat": "Net carry",
+     "instant": true,
+     "range": false
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "thetagang_breakeven_move",
+     "legendFormat": "Break-even",
+     "instant": true,
+     "range": false
     }
    ],
    "fieldConfig": {
     "defaults": {
-     "unit": "none",
-     "decimals": 4,
+     "unit": "currencyUSD",
+     "decimals": 0,
      "color": {
       "mode": "thresholds"
      },
@@ -686,7 +889,31 @@
       ]
      }
     },
-    "overrides": []
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Break-even"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percentunit"
+       },
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "fixed",
+         "fixedColor": "text"
+        }
+       }
+      ]
+     }
+    ]
    },
    "options": {
     "reduceOptions": {
@@ -697,13 +924,16 @@
      "values": false
     },
     "colorMode": "value",
-    "graphMode": "area",
-    "textMode": "value",
-    "justifyMode": "center",
-    "wideLayout": true
-   },
-   "timeFrom": "24h",
-   "hideTimeOverride": true
+    "graphMode": "none",
+    "textMode": "value_and_name",
+    "justifyMode": "auto",
+    "wideLayout": true,
+    "orientation": "horizontal",
+    "text": {
+     "titleSize": 13,
+     "valueSize": 20
+    }
+   }
   },
   {
    "id": 18,
@@ -825,7 +1055,7 @@
    "gridPos": {
     "x": 0,
     "y": 11,
-    "w": 12,
+    "w": 8,
     "h": 5
    }
   },
@@ -894,9 +1124,9 @@
     "sizing": "auto"
    },
    "gridPos": {
-    "x": 12,
+    "x": 8,
     "y": 11,
-    "w": 3,
+    "w": 4,
     "h": 5
    }
   },
@@ -965,25 +1195,25 @@
     "sizing": "auto"
    },
    "gridPos": {
-    "x": 15,
+    "x": 12,
     "y": 11,
-    "w": 3,
+    "w": 4,
     "h": 5
    }
   },
   {
    "id": 7,
    "type": "stat",
-   "title": "Need attention",
+   "title": "Attention",
    "description": "Positions without greeks (blocks new trades) + long options with |delta| >= long_option_alert_delta",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
    },
    "gridPos": {
-    "x": 18,
+    "x": 16,
     "y": 11,
-    "w": 3,
+    "w": 4,
     "h": 5
    },
    "targets": [
@@ -1055,9 +1285,9 @@
     "uid": "prometheus"
    },
    "gridPos": {
-    "x": 21,
+    "x": 20,
     "y": 11,
-    "w": 3,
+    "w": 4,
     "h": 5
    },
    "targets": [
@@ -1158,7 +1388,58 @@
       "minWidth": 80
      }
     },
-    "overrides": []
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Greek"
+      },
+      "properties": [
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "spx_delta": {
+            "text": "SPX delta",
+            "index": 0
+           },
+           "beta_delta_dollars": {
+            "text": "Beta delta $",
+            "index": 1
+           },
+           "delta_dollars": {
+            "text": "Delta $ (no beta)",
+            "index": 2
+           },
+           "gamma": {
+            "text": "Gamma (\u0394 / pt)",
+            "index": 3
+           },
+           "theta": {
+            "text": "Theta $/day",
+            "index": 4
+           },
+           "vega": {
+            "text": "Vega $/vol pt",
+            "index": 5
+           },
+           "volga": {
+            "text": "Volga $/vol pt",
+            "index": 6
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 135
+       }
+      ]
+     }
+    ]
    },
    "options": {
     "cellHeight": "sm"
@@ -1351,8 +1632,8 @@
   {
    "id": 21,
    "type": "stat",
-   "title": "VIX call hedge",
-   "description": "Long VIX calls held (beyond ignore_dte), the allocation weight at today's VIXMO, and the VIX level that sells them.",
+   "title": "VIX hedge",
+   "description": "Long VIX calls held (beyond ignore_dte); the allocation for new buys at today's VIXMO (your [strategy.vix_call_hedge.allocation] bands, a share of net liq; 'no VIXMO' until VIXMO quotes); and the VIX level that sells them.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -1375,7 +1656,7 @@
       "uid": "prometheus"
      },
      "refId": "B",
-     "expr": "sum(thetagang_vix_hedge{field=\"weight\"})",
+     "expr": "sum(thetagang_vix_hedge{field=\"weight\"}) or vector(-1)",
      "legendFormat": "Allocation (VIXMO)",
      "instant": true,
      "range": false
@@ -1413,6 +1694,20 @@
        {
         "id": "unit",
         "value": "percentunit"
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "-1": {
+            "text": "no VIXMO",
+            "index": 0
+           }
+          }
+         }
+        ]
        }
       ]
      }
@@ -1433,14 +1728,14 @@
    "gridPos": {
     "x": 16,
     "y": 17,
-    "w": 5,
+    "w": 4,
     "h": 11
    }
   },
   {
    "id": 22,
    "type": "table",
-   "title": "VIX hedge action",
+   "title": "Hedge",
    "description": "What the VIX call hedge would do now.",
    "datasource": {
     "type": "prometheus",
@@ -1461,7 +1756,11 @@
     }
    ],
    "fieldConfig": {
-    "defaults": {},
+    "defaults": {
+     "custom": {
+      "minWidth": 50
+     }
+    },
     "overrides": []
    },
    "options": {
@@ -1482,9 +1781,9 @@
     }
    ],
    "gridPos": {
-    "x": 21,
+    "x": 20,
     "y": 17,
-    "w": 3,
+    "w": 4,
     "h": 11
    }
   },
@@ -4068,7 +4367,7 @@
    "id": 14,
    "type": "table",
    "title": "Positions",
-   "description": "P&L ratio: share of the premium captured (shorts) or gained (longs); rolls/closes key off it",
+   "description": "Every position, grouped by symbol like the old bot (stock first, then options by expiry). Und. price: the underlying's price (the stock itself for stock rows). Delta, gamma, theta, vega: per share, as IB quotes them (stock delta = 1); x 100 x Qty for the position.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -4110,7 +4409,7 @@
       "uid": "prometheus"
      },
      "refId": "C",
-     "expr": "sum by (instrument, symbol, kind) (thetagang_position_price)",
+     "expr": "sum by (instrument, symbol, kind) (thetagang_position_underlying_price)",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -4151,10 +4450,86 @@
      "instant": true,
      "range": false,
      "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "G",
+     "expr": "sum by (instrument, symbol, kind) (thetagang_position_row)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "H",
+     "expr": "sum by (instrument, symbol, kind) (thetagang_position_stripe)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "I",
+     "expr": "sum by (instrument, symbol, kind) (thetagang_position_delta)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "J",
+     "expr": "sum by (instrument, symbol, kind) (thetagang_position_gamma)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "K",
+     "expr": "sum by (instrument, symbol, kind) (thetagang_position_theta)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "L",
+     "expr": "sum by (instrument, symbol, kind) (thetagang_position_vega)",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": ""
     }
    ],
    "fieldConfig": {
-    "defaults": {},
+    "defaults": {
+     "custom": {
+      "minWidth": 60
+     }
+    },
     "overrides": [
      {
       "matcher": {
@@ -4197,6 +4572,10 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 153
        }
       ]
      },
@@ -4241,6 +4620,222 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 112
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "R"
+      },
+      "properties": [
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "stock": {
+            "text": "S",
+            "index": 0
+           },
+           "call": {
+            "text": "C",
+            "index": 1
+           },
+           "put": {
+            "text": "P",
+            "index": 2
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 47
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Symbol"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 91
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "stripe"
+      },
+      "properties": [
+       {
+        "id": "custom.hidden",
+        "value": true
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-background",
+         "mode": "basic",
+         "applyToRow": true
+        }
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "thresholds"
+        }
+       },
+       {
+        "id": "thresholds",
+        "value": {
+         "mode": "absolute",
+         "steps": [
+          {
+           "color": "transparent",
+           "value": null
+          },
+          {
+           "color": "rgba(120, 160, 255, 0.13)",
+           "value": 1
+          }
+         ]
+        }
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Delta"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "custom.width",
+        "value": 94
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Gamma"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 3
+       },
+       {
+        "id": "custom.width",
+        "value": 99
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Theta"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 3
+       },
+       {
+        "id": "custom.width",
+        "value": 99
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Vega"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 3
+       },
+       {
+        "id": "custom.width",
+        "value": 99
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Contract"
+      },
+      "properties": [
+       {
+        "id": "custom.minWidth",
+        "value": 180
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Qty"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 83
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Avg price"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 112
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Und. price"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 117
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "DTE"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 73
        }
       ]
      }
@@ -4254,18 +4849,53 @@
      "id": "merge"
     },
     {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "Value #G"
+       }
+      ]
+     }
+    },
+    {
      "id": "organize",
      "options": {
       "excludeByName": {
-       "Time": true
+       "Time": true,
+       "Value #G": true
+      },
+      "indexByName": {
+       "symbol": 0,
+       "kind": 1,
+       "instrument": 2,
+       "Value #A": 3,
+       "Value #B": 4,
+       "Value #C": 5,
+       "Value #D": 6,
+       "Value #E": 7,
+       "Value #F": 8,
+       "Value #H": 13,
+       "Value #I": 9,
+       "Value #J": 10,
+       "Value #K": 11,
+       "Value #L": 12
       },
       "renameByName": {
+       "symbol": "Symbol",
+       "kind": "R",
+       "instrument": "Contract",
        "Value #A": "Qty",
        "Value #B": "Avg price",
-       "Value #C": "Price",
+       "Value #C": "Und. price",
        "Value #D": "Unrealized P&L",
        "Value #E": "P&L ratio",
-       "Value #F": "DTE"
+       "Value #F": "DTE",
+       "Value #H": "stripe",
+       "Value #I": "Delta",
+       "Value #J": "Gamma",
+       "Value #K": "Theta",
+       "Value #L": "Vega"
       }
      }
     }

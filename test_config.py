@@ -173,3 +173,12 @@ def test_fit_sizes_tables_to_their_rows_and_restacks_the_bands():
     ]
     ft.restack(panels)
     assert [p["gridPos"]["y"] for p in panels] == [0, 1, 1, 10, 30]
+
+
+def test_thetagang_transforms_are_ones_grafana_knows():
+    """Grafana silently skips an unknown transform id (configFromQuery is really configFromData)."""
+    known = {"configFromData", "filterFieldsByName", "groupingToMatrix", "joinByField", "merge", "organize",
+             "rowsToFields", "sortBy", "calculateField", "reduce", "seriesToRows", "labelsToFields"}
+    dashboard = _json(GRAFANA / "dashboards" / "thetagang" / "thetagang.json")
+    used = {t["id"] for p in dashboard["panels"] for t in p.get("transformations", [])}
+    assert used <= known, used - known
