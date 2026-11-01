@@ -410,7 +410,6 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0,
      "custom": {
       "show": "lines",
       "lineWidth": 2,
@@ -455,7 +454,7 @@
         "id": "color",
         "value": {
          "mode": "fixed",
-         "fixedColor": "#ffffff"
+         "fixedColor": "purple"
         }
        },
        {
@@ -571,7 +570,6 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0,
      "custom": {
       "show": "lines",
       "lineWidth": 2,
@@ -616,7 +614,7 @@
         "id": "color",
         "value": {
          "mode": "fixed",
-         "fixedColor": "#ffffff"
+         "fixedColor": "purple"
         }
        },
        {
@@ -787,7 +785,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 51,
+    "y": 33,
     "w": 24,
     "h": 6
    },
