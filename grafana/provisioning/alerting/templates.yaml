@@ -1,0 +1,10 @@
+{
+  "apiVersion": 1,
+  "templates": [
+    {
+      "orgId": 1,
+      "name": "telegram.readable",
+      "template": "{{ define \"telegram.readable\" -}}\n{{ range .Alerts.Firing -}}\n🔴 {{ toUpper .Labels.grafana_folder }} · {{ toUpper .Labels.account }} account\n{{ reReplaceAll \"^thetagang \" \"\" .Labels.alertname }}: {{ .Annotations.summary }}\nSince {{ (tz \"America/New_York\" .StartsAt).Format \"Mon 2 Jan 15:04\" }} New York\n\n{{ end -}}\n{{ range .Alerts.Resolved -}}\n✅ {{ toUpper .Labels.grafana_folder }} · {{ toUpper .Labels.account }} account\n{{ reReplaceAll \"^thetagang \" \"\" .Labels.alertname }}: back to normal\n\n{{ end -}}\n{{ end }}"
+    }
+  ]
+}

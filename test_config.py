@@ -26,7 +26,7 @@ def _rules():
 
 def test_every_provisioning_file_and_dashboard_parses_as_json():
     files = [p for p in GRAFANA.rglob("*") if p.is_file() and p.name != "contact-point.yaml"]  # that one is generated
-    assert len(files) == 7 and all(isinstance(_json(p), dict) for p in files)
+    assert len(files) == 8 and all(isinstance(_json(p), dict) for p in files)
 
 
 def test_each_project_has_its_own_grafana_folder():
@@ -95,6 +95,31 @@ def test_the_contact_point_is_rendered_with_the_chat_id_quoted_and_private(tmp_p
     text = out.read_text()
     assert "chatid: '-1001234567'" in text and "bottoken: '123456:AAH-abc_def'" in text  # quoted: Grafana needs strings
     assert stat.S_IMODE(out.stat().st_mode) == 0o600
+
+
+def test_telegram_messages_use_the_readable_template(tmp_path):
+    proc, out = _render(tmp_path)
+    templates = _json(ALERTING / "templates.yaml")["templates"]
+
+    assert proc.returncode == 0, proc.stderr
+    assert """message: '{{ template "telegram.readable" . }}'""" in out.read_text()
+    assert [t["name"] for t in templates] == ["telegram.readable"]
+    assert '{{ define "telegram.readable" -}}' in templates[0]["template"]
+
+
+def test_every_alert_says_which_account_it_is_about():
+    # The message header is "<PROJECT> · <ACCOUNT> account": intraday trades only the DU... paper login,
+    # thetagang the live U... account (its metrics' account label, 2026-11-01).
+    expected = {"intraday": "paper", "thetagang": "live"}
+    for group in _json(ALERTING / "rules.yaml")["groups"]:
+        assert {r["labels"]["account"] for r in group["rules"]} == {expected[group["name"]]}, group["name"]
+    assert "toUpper .Labels.account" in _json(ALERTING / "templates.yaml")["templates"][0]["template"]
+
+
+def test_alert_summaries_use_only_functions_grafana_has():
+    # Grafana's annotation templates have no arithmetic: "mul" left the stress-loss summary unrendered (2026-11-01)
+    for rule in _rules():
+        assert not re.search(r"\{\{[^}]*\b(mul|div|add|sub)\b", rule["annotations"]["summary"]), rule["title"]
 
 
 @pytest.mark.parametrize("token, chat", [("not-a-token", "1"), ("123:abc", "@mychannel"), ("123:abc", "")])

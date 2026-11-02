@@ -15,7 +15,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "core"
+            "window": "core",
+            "account": "paper"
           },
           "annotations": {
             "summary": "The momentum node was running in the last 8 hours and its metrics are now unreachable: did run_live_momentum.sh stop?"
@@ -63,7 +64,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "extended"
+            "window": "extended",
+            "account": "paper"
           },
           "annotations": {
             "summary": "The account exporter had IBKR data in the last 8 hours and has none now (TWS down or logged out, or the exporter stopped)."
@@ -111,7 +113,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "after_exit"
+            "window": "after_exit",
+            "account": "paper"
           },
           "annotations": {
             "summary": "A SOXX CFD position is still open after the 15:30 exit -- close it in TWS."
@@ -159,7 +162,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "session"
+            "window": "session",
+            "account": "paper"
           },
           "annotations": {
             "summary": "A momentum order was rejected, cancelled or expired -- see intraday_trades/intraday_<date>.csv."
@@ -207,7 +211,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "session"
+            "window": "session",
+            "account": "paper"
           },
           "annotations": {
             "summary": "Today's account P&L is below -2% of net liquidation."
@@ -255,7 +260,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "stale"
+            "window": "stale",
+            "account": "paper"
           },
           "annotations": {
             "summary": "The node is watching or in a position but has had no 5-min bar for 15 minutes."
@@ -311,7 +317,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "thetagang"
+            "window": "thetagang",
+            "account": "live"
           },
           "annotations": {
             "summary": "thetagang's portfolio monitor was running and stopped: the dashboard is not updating (cd ../thetagang/deploy && docker compose logs thetagang-monitor)."
@@ -359,7 +366,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "thetagang"
+            "window": "thetagang",
+            "account": "live"
           },
           "annotations": {
             "summary": "thetagang's trading strategy was running and stopped: nothing is rolled while it's down (cd ../thetagang/deploy && docker compose logs thetagang-nt)."
@@ -407,7 +415,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "thetagang"
+            "window": "thetagang",
+            "account": "live"
           },
           "annotations": {
             "summary": "thetagang-nt hasn't refreshed for over 5 minutes (TWS disconnected or the node stuck)."
@@ -455,7 +464,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "thetagang"
+            "window": "thetagang",
+            "account": "live"
           },
           "annotations": {
             "summary": "{{ $values.A.Value }} position(s) have no greeks for 30 min: SPX delta is incomplete and new trades are blocked."
@@ -503,10 +513,11 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "thetagang"
+            "window": "thetagang",
+            "account": "live"
           },
           "annotations": {
-            "summary": "{{ $values.A.Value }} long option(s) at or above long_option_alert_delta: roll or close by hand (the bot never trades them)."
+            "summary": "{{ $labels.instrument }} (long {{ $labels.qty }}): |delta| {{ printf \"%.2f\" $values.A.Value }}, at or past your {{ $labels.threshold }} alert level. Roll it out or close it by hand: the bot never trades long options."
           },
           "data": [
             {
@@ -518,7 +529,7 @@
               "datasourceUid": "prometheus",
               "model": {
                 "refId": "A",
-                "expr": "max(thetagang_long_option_alerts)",
+                "expr": "abs(thetagang_long_option_alert)",
                 "instant": true
               }
             },
@@ -551,7 +562,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "thetagang"
+            "window": "thetagang",
+            "account": "live"
           },
           "annotations": {
             "summary": "Beta delta $ has been outside the SPX delta neutral band for an hour with trading on: the hedge isn't happening (trades blocked or capped)."
@@ -599,10 +611,11 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "thetagang"
+            "window": "thetagang",
+            "account": "live"
           },
           "annotations": {
-            "summary": "A -10% SPX move would lose {{ humanizePercentage (mul $values.A.Value -1) }} of net liquidation (limit 5%)."
+            "summary": "A -10% SPX move would change net liquidation by {{ humanizePercentage $values.A.Value }} (alert below -5%)."
           },
           "data": [
             {
@@ -647,7 +660,8 @@
           "noDataState": "OK",
           "execErrState": "Error",
           "labels": {
-            "window": "thetagang"
+            "window": "thetagang",
+            "account": "live"
           },
           "annotations": {
             "summary": "thetagang-nt sent real order(s) in the last 10 min: see docker compose logs thetagang-nt."
