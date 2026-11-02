@@ -1224,7 +1224,7 @@
    "id": 7,
    "type": "stat",
    "title": "Attention",
-   "description": "Positions without greeks (blocks new trades) + long options with |delta| >= long_option_alert_delta",
+   "description": "Positions without greeks (blocks new trades) + long options (standalone or a debit spread's long leg) with |delta| >= debit_option_alert_delta",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -2900,7 +2900,10 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0
+     "decimals": 0,
+     "custom": {
+      "minWidth": 50
+     }
     },
     "overrides": [
      {
@@ -2944,6 +2947,10 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 110
        }
       ]
      },
@@ -2988,6 +2995,10 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 110
        }
       ]
      },
@@ -3032,6 +3043,10 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 110
        }
       ]
      },
@@ -3076,6 +3091,10 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 110
        }
       ]
      },
@@ -3120,6 +3139,10 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 110
        }
       ]
      },
@@ -3164,6 +3187,10 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 110
        }
       ]
      },
@@ -3208,6 +3235,10 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 110
        }
       ]
      },
@@ -3252,6 +3283,22 @@
         "value": {
          "type": "color-text"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 110
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Symbol"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 80
        }
       ]
      }
@@ -4628,10 +4675,532 @@
    }
   },
   {
+   "id": 52,
+   "type": "table",
+   "title": "Structures (option legs held as one position)",
+   "description": "Each symbol's option legs grouped into the positions they form (butterflies, straddles/strangles, verticals, calendars/diagonals, single legs; your [[strategy.structures]] groups first), with combined figures. Read-only.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 154,
+    "w": 24,
+    "h": 36
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "minWidth": 50
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Structure"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 320
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Kind"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 120
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Managed by"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "by hand",
+           "result": {
+            "color": "yellow",
+            "index": 0
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "description",
+        "value": "bot: credit = [strategy.credit] rules; bot: debit = [strategy.debit] rules; by hand = the bot leaves it to you (phase 1: butterflies, straddles, strangles, calendars/diagonals, your [[strategy.structures]] groups, index options)."
+       },
+       {
+        "id": "custom.width",
+        "value": 105
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Qty"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "custom.width",
+        "value": 50
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "DTE"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "custom.width",
+        "value": 50
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Cost ($)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "locale"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "description",
+        "value": "Paid (+) or received (-) for the whole position."
+       },
+       {
+        "id": "custom.width",
+        "value": 85
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Value ($)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "locale"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "custom.width",
+        "value": 85
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "P&L ($)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "locale"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "thresholds",
+        "value": {
+         "mode": "absolute",
+         "steps": [
+          {
+           "color": "red",
+           "value": null
+          },
+          {
+           "color": "green",
+           "value": 0
+          }
+         ]
+        }
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "thresholds"
+        }
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "custom.width",
+        "value": 85
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Max profit"
+      },
+      "properties": [
+       {
+        "id": "custom.align",
+        "value": "right"
+       },
+       {
+        "id": "description",
+        "value": "At expiry, from the combined payoff. n/a: legs at several expiries."
+       },
+       {
+        "id": "custom.width",
+        "value": 95
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Max loss"
+      },
+      "properties": [
+       {
+        "id": "custom.align",
+        "value": "right"
+       },
+       {
+        "id": "custom.width",
+        "value": 95
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Breakevens"
+      },
+      "properties": [
+       {
+        "id": "description",
+        "value": "Underlying prices at expiry where the whole position makes nothing."
+       },
+       {
+        "id": "custom.width",
+        "value": 130
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "\u0394 (shares)"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 1
+       },
+       {
+        "id": "description",
+        "value": "Combined delta in shares of the underlying (sum of qty x 100 x leg delta)."
+       },
+       {
+        "id": "custom.width",
+        "value": 90
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "\u0393 (sh/$1)"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "custom.width",
+        "value": 85
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "\u0398 ($/day)"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 1
+       },
+       {
+        "id": "custom.width",
+        "value": 85
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "V ($/vol pt)"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 1
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (name, kind, managed, max_profit, max_loss, breakevens) (thetagang_structure_info)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum by (name) (thetagang_structure{field=\"qty\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "C",
+     "expr": "sum by (name) (thetagang_structure{field=\"dte\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "D",
+     "expr": "sum by (name) (thetagang_structure{field=\"cost\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "E",
+     "expr": "sum by (name) (thetagang_structure{field=\"value\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "F",
+     "expr": "sum by (name) (thetagang_structure{field=\"pnl\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "G",
+     "expr": "sum by (name) (thetagang_structure{field=\"delta\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "H",
+     "expr": "sum by (name) (thetagang_structure{field=\"gamma\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "I",
+     "expr": "sum by (name) (thetagang_structure{field=\"theta\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "J",
+     "expr": "sum by (name) (thetagang_structure{field=\"vega\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "joinByField",
+     "options": {
+      "byField": "name",
+      "mode": "outer"
+     }
+    },
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!(Time.*|Value #A)$).*$"
+      }
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "name": "Structure",
+       "kind": "Kind",
+       "managed": "Managed by",
+       "max_profit": "Max profit",
+       "max_loss": "Max loss",
+       "breakevens": "Breakevens",
+       "Value #B": "Qty",
+       "Value #C": "DTE",
+       "Value #D": "Cost ($)",
+       "Value #E": "Value ($)",
+       "Value #F": "P&L ($)",
+       "Value #G": "\u0394 (shares)",
+       "Value #H": "\u0393 (sh/$1)",
+       "Value #I": "\u0398 ($/day)",
+       "Value #J": "V ($/vol pt)"
+      },
+      "indexByName": {
+       "name": 0,
+       "kind": 1,
+       "managed": 2,
+       "Value #B": 3,
+       "Value #C": 4,
+       "Value #D": 5,
+       "Value #E": 6,
+       "Value #F": 7,
+       "max_profit": 8,
+       "max_loss": 9,
+       "breakevens": 10,
+       "Value #G": 11,
+       "Value #H": 12,
+       "Value #I": 13,
+       "Value #J": 14
+      }
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "Structure"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
    "id": 29,
    "type": "table",
    "title": "Calls (standalone)",
-   "description": "Calls not in a vertical. Shorts: roll / close / keep by [roll_when]; take profit = buy back at or below this price per share (close_at_pnl). Longs: roll or close by hand once |delta| >= long_option_alert_delta. P&L: of the premium.",
+   "description": "Calls not in a vertical. Shorts: roll / close / keep by [credit.roll_when]; take profit = buy back at or below this price per share (close_at_pnl). Longs: [debit] rules, as for debit spreads: take profit = sell at or above (1 + long_take_profit_gain) x the premium paid, else roll once DTE <= debit.roll_when.dte; a Telegram alert once |delta| >= debit_option_alert_delta. P&L: of the premium.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -4720,11 +5289,23 @@
      "instant": true,
      "range": false,
      "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "H",
+     "expr": "sum by (name) (thetagang_action{table=\"calls\",field=\"underlying\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
     }
    ],
    "gridPos": {
     "x": 0,
-    "y": 154,
+    "y": 190,
     "w": 24,
     "h": 19
    },
@@ -4757,7 +5338,8 @@
        "take_profit": "Take profit at",
        "action": "Action",
        "Value #F": "Breakeven",
-       "Value #G": "P&L ($)"
+       "Value #G": "P&L ($)",
+       "Value #H": "Underlying"
       },
       "indexByName": {
        "name": 0,
@@ -4766,10 +5348,11 @@
        "Value #B": 3,
        "Value #C": 4,
        "Value #D": 5,
-       "take_profit": 8,
-       "action": 9,
-       "Value #F": 7,
-       "Value #G": 6
+       "take_profit": 9,
+       "action": 10,
+       "Value #F": 8,
+       "Value #G": 6,
+       "Value #H": 7
       }
      }
     },
@@ -5100,6 +5683,30 @@
         }
        }
       ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Underlying"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "unit",
+        "value": "none"
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       },
+       {
+        "id": "description",
+        "value": "The underlying's current price, to compare with the breakeven."
+       }
+      ]
      }
     ]
    },
@@ -5112,7 +5719,7 @@
    "id": 30,
    "type": "table",
    "title": "Puts (standalone)",
-   "description": "Puts not in a vertical. Shorts: roll / close / keep by [roll_when]; take profit = buy back at or below this price per share (close_at_pnl). Longs: roll or close by hand once |delta| >= long_option_alert_delta. P&L: of the premium.",
+   "description": "Puts not in a vertical. Shorts: roll / close / keep by [credit.roll_when]; take profit = buy back at or below this price per share (close_at_pnl). Longs: [debit] rules, as for debit spreads: take profit = sell at or above (1 + long_take_profit_gain) x the premium paid, else roll once DTE <= debit.roll_when.dte; a Telegram alert once |delta| >= debit_option_alert_delta. P&L: of the premium.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -5201,11 +5808,23 @@
      "instant": true,
      "range": false,
      "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "H",
+     "expr": "sum by (name) (thetagang_action{table=\"puts\",field=\"underlying\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
     }
    ],
    "gridPos": {
     "x": 0,
-    "y": 173,
+    "y": 209,
     "w": 24,
     "h": 16
    },
@@ -5238,7 +5857,8 @@
        "take_profit": "Take profit at",
        "action": "Action",
        "Value #F": "Breakeven",
-       "Value #G": "P&L ($)"
+       "Value #G": "P&L ($)",
+       "Value #H": "Underlying"
       },
       "indexByName": {
        "name": 0,
@@ -5247,10 +5867,11 @@
        "Value #B": 3,
        "Value #C": 4,
        "Value #D": 5,
-       "take_profit": 8,
-       "action": 9,
-       "Value #F": 7,
-       "Value #G": 6
+       "take_profit": 9,
+       "action": 10,
+       "Value #F": 8,
+       "Value #G": 6,
+       "Value #H": 7
       }
      }
     },
@@ -5581,6 +6202,30 @@
         }
        }
       ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Underlying"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "unit",
+        "value": "none"
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       },
+       {
+        "id": "description",
+        "value": "The underlying's current price, to compare with the breakeven."
+       }
+      ]
      }
     ]
    },
@@ -5593,7 +6238,7 @@
    "id": 31,
    "type": "table",
    "title": "Spreads (credit and debit verticals, one combo order each)",
-   "description": "Credit: roll / close by [roll_when], take profit = buy back at or below (close_at_pnl of the credit). Debit: close at or above the take-profit (debit_spread_take_profit of the max profit), roll near expiry. P&L: of the net credit / debit.",
+   "description": "Credit: roll / close by [credit.roll_when], take profit = buy back at or below (close_at_pnl of the credit). Debit: close at or above the take-profit (debit.take_profit of the max profit), roll near expiry. P&L: of the net credit / debit.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -5682,11 +6327,23 @@
      "instant": true,
      "range": false,
      "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "H",
+     "expr": "sum by (name) (thetagang_action{table=\"spreads\",field=\"underlying\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
     }
    ],
    "gridPos": {
     "x": 0,
-    "y": 189,
+    "y": 225,
     "w": 24,
     "h": 12
    },
@@ -5719,7 +6376,8 @@
        "action": "Action",
        "Value #E": "Breakeven",
        "Value #F": "P&L ($)",
-       "Value #G": "Delta"
+       "Value #G": "Delta",
+       "Value #H": "Underlying"
       },
       "indexByName": {
        "name": 0,
@@ -5727,11 +6385,12 @@
        "Value #A": 2,
        "Value #B": 3,
        "Value #C": 5,
-       "take_profit": 8,
-       "action": 9,
-       "Value #E": 7,
+       "take_profit": 9,
+       "action": 10,
+       "Value #E": 8,
        "Value #F": 6,
-       "Value #G": 4
+       "Value #G": 4,
+       "Value #H": 7
       }
      }
     },
@@ -6038,6 +6697,30 @@
         }
        }
       ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Underlying"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "unit",
+        "value": "none"
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       },
+       {
+        "id": "description",
+        "value": "The underlying's current price, to compare with the breakeven."
+       }
+      ]
      }
     ]
    },
@@ -6054,7 +6737,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 201,
+    "y": 237,
     "w": 24,
     "h": 1
    },
@@ -6073,7 +6756,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 202,
+    "y": 238,
     "w": 24,
     "h": 54
    },
@@ -6646,7 +7329,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 256,
+    "y": 292,
     "w": 24,
     "h": 1
    },
@@ -6665,7 +7348,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 257,
+    "y": 293,
     "w": 12,
     "h": 8
    },
@@ -6746,7 +7429,7 @@
    },
    "gridPos": {
     "x": 12,
-    "y": 257,
+    "y": 293,
     "w": 8,
     "h": 8
    },
@@ -6790,7 +7473,7 @@
    },
    "gridPos": {
     "x": 20,
-    "y": 257,
+    "y": 293,
     "w": 4,
     "h": 8
    },
@@ -6857,7 +7540,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 265,
+    "y": 301,
     "w": 24,
     "h": 12
    },

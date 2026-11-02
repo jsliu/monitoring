@@ -507,7 +507,7 @@
         },
         {
           "uid": "tg-long-option",
-          "title": "thetagang long option to roll by hand",
+          "title": "thetagang long option at the alert delta",
           "condition": "C",
           "for": "0m",
           "noDataState": "OK",
@@ -517,7 +517,7 @@
             "account": "live"
           },
           "annotations": {
-            "summary": "{{ $labels.instrument }} (long {{ $labels.qty }}): |delta| {{ printf \"%.2f\" $values.A.Value }}, at or past your {{ $labels.threshold }} alert level. Roll it out or close it by hand: the bot never trades long options."
+            "summary": "{{ $labels.instrument }} (long {{ $labels.qty }}): |delta| {{ printf \"%.2f\" $values.A.Value }}, at or past your {{ $labels.threshold }} alert level. {{ $labels.advice }}"
           },
           "data": [
             {
