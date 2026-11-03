@@ -60,7 +60,7 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0,
+     "decimals": 1,
      "color": {
       "mode": "thresholds"
      },
@@ -99,7 +99,7 @@
    "id": 2,
    "type": "stat",
    "title": "Unrealized P&L",
-   "description": "",
+   "description": "IB's unrealized P&L for the account, as TWS shows it. The Positions table's per-position figures are the bot's own (from its quotes).",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -117,16 +117,16 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "thetagang_unrealized_pnl",
+     "expr": "thetagang_account_value{field=\"unrealized_pnl\"}",
      "legendFormat": "unrealized",
-     "instant": false,
-     "range": true
+     "instant": true,
+     "range": false
     }
    ],
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0,
+     "decimals": 1,
      "color": {
       "mode": "thresholds"
      },
@@ -155,12 +155,11 @@
      "values": false
     },
     "colorMode": "background",
-    "graphMode": "area",
+    "graphMode": "none",
     "textMode": "value",
     "justifyMode": "center",
     "wideLayout": true
    },
-   "timeFrom": "24h",
    "hideTimeOverride": true,
    "interval": "1m",
    "maxDataPoints": 1500
@@ -259,7 +258,7 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0,
+     "decimals": 1,
      "color": {
       "mode": "thresholds"
      },
@@ -415,7 +414,7 @@
    "fieldConfig": {
     "defaults": {
      "unit": "none",
-     "decimals": 2,
+     "decimals": 1,
      "color": {
       "mode": "thresholds"
      },
@@ -714,7 +713,7 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0,
+     "decimals": 1,
      "color": {
       "mode": "thresholds"
      },
@@ -784,7 +783,7 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0,
+     "decimals": 1,
      "color": {
       "mode": "thresholds"
      },
@@ -1101,7 +1100,7 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0
+     "decimals": 1
     },
     "overrides": [
      {
@@ -1117,10 +1116,6 @@
        {
         "id": "unit",
         "value": "percentunit"
-       },
-       {
-        "id": "decimals",
-        "value": 1
        }
       ]
      }
