@@ -506,55 +506,6 @@
           ]
         },
         {
-          "uid": "tg-long-option",
-          "title": "thetagang long option at the alert delta",
-          "condition": "C",
-          "for": "0m",
-          "noDataState": "OK",
-          "execErrState": "Error",
-          "labels": {
-            "window": "thetagang",
-            "account": "live"
-          },
-          "annotations": {
-            "summary": "{{ $labels.instrument }} (long {{ $labels.qty }}): |delta| {{ printf \"%.2f\" $values.A.Value }}, at or past your {{ $labels.threshold }} alert level. {{ $labels.advice }}"
-          },
-          "data": [
-            {
-              "refId": "A",
-              "relativeTimeRange": {
-                "from": 600,
-                "to": 0
-              },
-              "datasourceUid": "prometheus",
-              "model": {
-                "refId": "A",
-                "expr": "abs(thetagang_long_option_alert)",
-                "instant": true
-              }
-            },
-            {
-              "refId": "C",
-              "datasourceUid": "__expr__",
-              "model": {
-                "refId": "C",
-                "type": "threshold",
-                "expression": "A",
-                "conditions": [
-                  {
-                    "evaluator": {
-                      "type": "gt",
-                      "params": [
-                        0
-                      ]
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
           "uid": "tg-delta-band",
           "title": "thetagang SPX delta out of band",
           "condition": "C",
@@ -702,6 +653,12 @@
           ]
         }
       ]
+    }
+  ],
+  "deleteRules": [
+    {
+      "orgId": 1,
+      "uid": "tg-long-option"
     }
   ]
 }
