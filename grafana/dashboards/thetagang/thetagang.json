@@ -142,7 +142,18 @@
         "value": 0
        }
       ]
-     }
+     },
+     "mappings": [
+      {
+       "type": "value",
+       "options": {
+        "0": {
+         "text": "$0",
+         "index": 0
+        }
+       }
+      }
+     ]
     },
     "overrides": []
    },
@@ -189,7 +200,7 @@
    "fieldConfig": {
     "defaults": {
      "unit": "currencyUSD",
-     "decimals": 0,
+     "decimals": 1,
      "color": {
       "mode": "thresholds"
      },
@@ -205,7 +216,18 @@
         "value": 0
        }
       ]
-     }
+     },
+     "mappings": [
+      {
+       "type": "value",
+       "options": {
+        "0": {
+         "text": "$0",
+         "index": 0
+        }
+       }
+      }
+     ]
     },
     "overrides": []
    },
@@ -274,7 +296,18 @@
         "value": 0
        }
       ]
-     }
+     },
+     "mappings": [
+      {
+       "type": "value",
+       "options": {
+        "0": {
+         "text": "$0",
+         "index": 0
+        }
+       }
+      }
+     ]
     },
     "overrides": []
    },
