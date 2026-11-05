@@ -35,15 +35,17 @@
      "uid": "prometheus"
     },
     "query": {
-     "query": "label_values(thetagang_pm_info, strategy)",
-     "refId": "strategy"
+     "query": "query_result(max by (strategy) (thetagang_pm_info))",
+     "refId": "strategy",
+     "qryType": 3
     },
-    "definition": "label_values(thetagang_pm_info, strategy)",
+    "definition": "query_result(max by (strategy) (thetagang_pm_info))",
     "refresh": 2,
     "sort": 1,
     "current": {},
     "includeAll": false,
-    "multi": false
+    "multi": false,
+    "regex": "/strategy=\"([^\"]+)\"/"
    }
   ]
  },
