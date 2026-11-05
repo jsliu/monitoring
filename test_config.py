@@ -44,7 +44,7 @@ def test_every_alert_window_has_its_route_and_a_new_york_time_interval():
     routes = {r["object_matchers"][0][2]: r for r in notifications["policies"][0]["routes"]}
     rules = _rules()
 
-    assert len(rules) == 13  # 6 intraday + 7 thetagang
+    assert len(rules) == 14  # 6 intraday + 8 thetagang
     for rule in rules:
         window = rule["labels"]["window"]
         assert routes[window]["active_time_intervals"] == [window]
@@ -55,7 +55,7 @@ def test_thetagang_alerts_query_only_thetagang_metrics():
     groups = _json(ALERTING / "rules.yaml")["groups"]
     rules = [r for g in groups if g["name"] == "thetagang" for r in g["rules"]]
     exprs = [d["model"]["expr"] for r in rules for d in r["data"] if "expr" in d["model"]]
-    assert len(rules) == 7 and all(r["labels"]["window"] == "thetagang" for r in rules)
+    assert len(rules) == 8 and all(r["labels"]["window"] == "thetagang" for r in rules)
     assert all(re.findall(r"\bthetagang_[a-z_]+|up\{job=\"thetagang(-strategy)?\"\}", e) for e in exprs)
 
 

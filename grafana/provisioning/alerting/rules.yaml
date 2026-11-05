@@ -651,6 +651,55 @@
               }
             }
           ]
+        },
+        {
+          "uid": "tg-structure-action",
+          "title": "thetagang roll or close",
+          "condition": "C",
+          "for": "0m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang",
+            "account": "live"
+          },
+          "annotations": {
+            "summary": "{{ $labels.name }}: {{ $labels.recommendation }} ({{ $labels.why }}).{{ if ne $labels.take_profit \"-\" }} Take profit at {{ $labels.take_profit }}.{{ end }}{{ if ne $labels.leg_order \"-\" }} Orders: {{ $labels.leg_order }}.{{ end }} Managed by: {{ $labels.managed }}."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "thetagang_structure_info{recommendation=~\"(Roll|Close|Adjust).*\"}",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
         }
       ]
     }

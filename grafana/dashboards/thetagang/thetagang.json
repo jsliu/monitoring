@@ -5717,6 +5717,18 @@
      "instant": true,
      "range": false,
      "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "N",
+     "expr": "sum by (instrument, symbol, kind) (thetagang_position_gamma_theta)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
     }
    ],
    "fieldConfig": {
@@ -6057,6 +6069,26 @@
         "value": 120
        }
       ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "\u0393/|\u0398|"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 2
+       },
+       {
+        "id": "custom.width",
+        "value": 75
+       },
+       {
+        "id": "description",
+        "value": "Long options only (positive gamma, negative theta): gamma per share divided by the daily theta per share, i.e. gamma bought for each $1 a day of decay. Higher = more convexity for the time paid."
+       }
+      ]
      }
     ]
    },
@@ -6093,13 +6125,14 @@
        "Value #C": 5,
        "Value #D": 7,
        "Value #E": 8,
-       "Value #F": 9,
-       "Value #H": 14,
-       "Value #I": 10,
-       "Value #J": 11,
-       "Value #K": 12,
-       "Value #L": 13,
-       "Value #M": 6
+       "Value #F": 10,
+       "Value #H": 15,
+       "Value #I": 11,
+       "Value #J": 12,
+       "Value #K": 13,
+       "Value #L": 14,
+       "Value #M": 6,
+       "Value #N": 9
       },
       "renameByName": {
        "symbol": "Symbol",
@@ -6116,7 +6149,8 @@
        "Value #J": "Gamma",
        "Value #K": "Theta",
        "Value #L": "Vega",
-       "Value #M": "Breakeven"
+       "Value #M": "Breakeven",
+       "Value #N": "\u0393/|\u0398|"
       }
      }
     }
