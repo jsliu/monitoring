@@ -653,8 +653,8 @@
           ]
         },
         {
-          "uid": "tg-structure-action",
-          "title": "thetagang roll or close",
+          "uid": "tg-pm-review",
+          "title": "thetagang PM review",
           "condition": "C",
           "for": "0m",
           "noDataState": "OK",
@@ -664,7 +664,7 @@
             "account": "live"
           },
           "annotations": {
-            "summary": "{{ $labels.name }}: {{ $labels.recommendation }} ({{ $labels.why }}).{{ if ne $labels.take_profit \"-\" }} Take profit at {{ $labels.take_profit }}.{{ end }}{{ if ne $labels.leg_order \"-\" }} Orders: {{ $labels.leg_order }}.{{ end }} Managed by: {{ $labels.managed }}."
+            "summary": "{{ $labels.strategy }} ({{ $labels.structure }}): {{ $labels.outcome }}. {{ $labels.signals }}. Bot rules say: {{ $labels.bot }}. Open the Portfolio Manager to review."
           },
           "data": [
             {
@@ -676,7 +676,7 @@
               "datasourceUid": "prometheus",
               "model": {
                 "refId": "A",
-                "expr": "thetagang_structure_info{recommendation=~\"(Roll|Close|Adjust).*\"}",
+                "expr": "thetagang_pm_info{top=~\"P0|P1\", outcome!=\"REVIEW - data unreliable\"}",
                 "instant": true
               }
             },
@@ -708,6 +708,10 @@
     {
       "orgId": 1,
       "uid": "tg-long-option"
+    },
+    {
+      "orgId": 1,
+      "uid": "tg-structure-action"
     }
   ]
 }

@@ -1320,7 +1320,7 @@
    "id": 7,
    "type": "stat",
    "title": "Attention",
-   "description": "Structures whose recommendation is to roll, close or adjust a leg now (the Structures table's Recommendation column); Keep, Review and By hand don't count.",
+   "description": "Strategies with an open P0 (hard) or P1 (time / profit) review signal from the Portfolio Manager, including P0 'data unreliable'. Click for the review queue.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -1338,7 +1338,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "count(thetagang_structure_info{recommendation=~\"(Roll|Close|Adjust).*\"}) or vector(0)",
+     "expr": "count(thetagang_pm_info{top=~\"P0|P1\"}) or vector(0)",
      "legendFormat": "",
      "instant": true,
      "range": false
@@ -1388,7 +1388,13 @@
     "graphMode": "none",
     "textMode": "value",
     "justifyMode": "center"
-   }
+   },
+   "links": [
+    {
+     "title": "Review queue",
+     "url": "/d/thetagang-pm/portfolio-manager?${__url_time_range}"
+    }
+   ]
   },
   {
    "id": 8,
@@ -4774,7 +4780,7 @@
    "id": 52,
    "type": "table",
    "title": "Structures (option legs held as one position)",
-   "description": "Each symbol's option legs grouped into the positions they form (butterflies, straddles/strangles, verticals, calendars/diagonals, single legs; your [[strategy.structures]] groups first), with combined figures. Each with a recommendation and its reason. Read-only: nothing here is traded. Replaces the old Calls / Puts / Spreads tables; each leg on its own is in the Positions table.",
+   "description": "Each symbol's option legs grouped into the positions they form, with combined figures, and the Portfolio Manager's priority and outcome (vault rules; it decides, the bot's roll/close rules no longer trade). Click a strategy for its review detail.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -4813,43 +4819,6 @@
        {
         "id": "custom.width",
         "value": 120
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Managed by"
-      },
-      "properties": [
-       {
-        "id": "custom.cellOptions",
-        "value": {
-         "type": "color-text"
-        }
-       },
-       {
-        "id": "mappings",
-        "value": [
-         {
-          "type": "regex",
-          "options": {
-           "pattern": "by hand",
-           "result": {
-            "color": "yellow",
-            "index": 0
-           }
-          }
-         }
-        ]
-       },
-       {
-        "id": "description",
-        "value": "bot: credit = [strategy.credit] rules; bot: debit = [strategy.debit] rules; by hand = the bot leaves it to you (phase 1: butterflies, straddles, strangles, calendars/diagonals, your [[strategy.structures]] groups, index options)."
-       },
-       {
-        "id": "custom.width",
-        "value": 105
        }
       ]
      },
@@ -5100,124 +5069,6 @@
      {
       "matcher": {
        "id": "byName",
-       "options": "Recommendation"
-      },
-      "properties": [
-       {
-        "id": "custom.cellOptions",
-        "value": {
-         "type": "color-text"
-        }
-       },
-       {
-        "id": "mappings",
-        "value": [
-         {
-          "type": "regex",
-          "options": {
-           "pattern": "^Adjust leg.*",
-           "result": {
-            "color": "orange",
-            "index": 0
-           }
-          }
-         },
-         {
-          "type": "regex",
-          "options": {
-           "pattern": "^Roll.*",
-           "result": {
-            "color": "blue",
-            "index": 1
-           }
-          }
-         },
-         {
-          "type": "regex",
-          "options": {
-           "pattern": "^Close.*",
-           "result": {
-            "color": "green",
-            "index": 2
-           }
-          }
-         },
-         {
-          "type": "regex",
-          "options": {
-           "pattern": "^Review.*",
-           "result": {
-            "color": "yellow",
-            "index": 3
-           }
-          }
-         },
-         {
-          "type": "regex",
-          "options": {
-           "pattern": ".*",
-           "result": {
-            "color": "text",
-            "index": 4
-           }
-          }
-         }
-        ]
-       },
-       {
-        "id": "custom.width",
-        "value": 290
-       },
-       {
-        "id": "description",
-        "value": "Bot-managed rows: what its rules would do. Others: [strategy.butterfly], [strategy.straddle], [strategy.calendar] recommendations, shown and not traded."
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Why"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 300
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Take profit at"
-      },
-      "properties": [
-       {
-        "id": "color",
-        "value": {
-         "mode": "fixed",
-         "fixedColor": "green"
-        }
-       },
-       {
-        "id": "custom.cellOptions",
-        "value": {
-         "type": "color-text"
-        }
-       },
-       {
-        "id": "custom.width",
-        "value": 120
-       },
-       {
-        "id": "description",
-        "value": "Price per share of one structure that takes profit: buy back at or below (short options, credit spreads) or sell at or above (the rest)."
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
        "options": "P&L %"
       },
       "properties": [
@@ -5286,16 +5137,133 @@
      {
       "matcher": {
        "id": "byName",
-       "options": "Leg order"
+       "options": "PM strategy"
       },
       "properties": [
        {
+        "id": "links",
+        "value": [
+         {
+          "title": "Open in Portfolio Manager",
+          "url": "/d/thetagang-pm/portfolio-manager?var-strategy=${__data.fields[\"PM strategy\"]}&${__url_time_range}"
+         }
+        ]
+       },
+       {
         "id": "custom.width",
-        "value": 520
+        "value": 190
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "PM priority"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "custom.width",
+        "value": 90
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "P0": {
+            "color": "red",
+            "index": 0
+           },
+           "P1": {
+            "color": "orange",
+            "index": 1
+           },
+           "P2": {
+            "color": "yellow",
+            "index": 2
+           },
+           "-": {
+            "color": "green",
+            "text": "\u2013",
+            "index": 3
+           }
+          }
+         }
+        ]
        },
        {
         "id": "description",
-        "value": "The recommendation as one order per leg, each at its current mid: the leg to adjust, or every leg to close (half of each for a partial close). Legs opened at different times show in TWS as separate positions, so a combined price can't be set on them; trade them one by one at these prices."
+        "value": "The Portfolio Manager's highest open review signal (vault rules). Click the strategy for its detail."
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "PM outcome"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "custom.width",
+        "value": 190
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^CLOSE.*",
+           "result": {
+            "color": "red",
+            "index": 0
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": ".*data unreliable",
+           "result": {
+            "color": "purple",
+            "index": 1
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^REVIEW.*",
+           "result": {
+            "color": "orange",
+            "index": 2
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^HOLD",
+           "result": {
+            "color": "green",
+            "index": 3
+           }
+          }
+         }
+        ]
        }
       ]
      }
@@ -5312,7 +5280,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "sum by (name, kind, managed, max_profit, max_loss, breakevens, recommendation, why, take_profit, leg_order) (thetagang_structure_info)",
+     "expr": "sum by (name, kind, max_profit, max_loss, breakevens) (thetagang_structure_info)",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -5449,6 +5417,18 @@
      "instant": true,
      "range": false,
      "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "M",
+     "instant": true,
+     "range": false,
+     "format": "table",
+     "legendFormat": "",
+     "expr": "label_replace(sum by (structure, strategy, top, outcome) (thetagang_pm_info), \"name\", \"$1\", \"structure\", \"(.*)\")"
     }
    ],
    "transformations": [
@@ -5463,7 +5443,7 @@
      "id": "filterFieldsByName",
      "options": {
       "include": {
-       "pattern": "^(?!(Time.*|Value #A)$).*$"
+       "pattern": "^(?!(Time.*|Value #A|Value #M|structure)$).*$"
       }
      }
     },
@@ -5473,7 +5453,6 @@
       "renameByName": {
        "name": "Structure",
        "kind": "Kind",
-       "managed": "Managed by",
        "max_profit": "Max profit",
        "max_loss": "Max loss",
        "breakevens": "Breakevens",
@@ -5486,35 +5465,36 @@
        "Value #H": "\u0393 (sh/$1)",
        "Value #I": "\u0398 ($/day)",
        "Value #J": "V ($/vol pt)",
-       "recommendation": "Recommendation",
-       "why": "Why",
-       "take_profit": "Take profit at",
        "Value #K": "P&L %",
        "Value #L": "Underlying",
-       "leg_order": "Leg order"
+       "strategy": "PM strategy",
+       "top": "PM priority",
+       "outcome": "PM outcome"
       },
       "indexByName": {
        "name": 0,
        "kind": 1,
-       "managed": 2,
-       "recommendation": 3,
-       "why": 4,
-       "take_profit": 5,
-       "Value #B": 7,
-       "Value #C": 8,
-       "Value #L": 9,
-       "Value #D": 10,
-       "Value #E": 11,
-       "Value #F": 12,
-       "Value #K": 13,
-       "max_profit": 14,
-       "max_loss": 15,
-       "breakevens": 16,
-       "Value #G": 17,
-       "Value #H": 18,
-       "Value #I": 19,
-       "Value #J": 20,
-       "leg_order": 6
+       "strategy": 2,
+       "top": 3,
+       "outcome": 4,
+       "Value #B": 5,
+       "Value #C": 6,
+       "Value #L": 7,
+       "Value #D": 8,
+       "Value #E": 9,
+       "Value #F": 10,
+       "Value #K": 11,
+       "max_profit": 12,
+       "max_loss": 13,
+       "breakevens": 14,
+       "Value #G": 15,
+       "Value #H": 16,
+       "Value #I": 17,
+       "Value #J": 18
+      },
+      "excludeByName": {
+       "structure": true,
+       "Value #M": true
       }
      }
     },
@@ -5713,18 +5693,6 @@
      },
      "refId": "M",
      "expr": "sum by (instrument, symbol, kind) (thetagang_position_breakeven)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "N",
-     "expr": "sum by (instrument, symbol, kind) (thetagang_position_gamma_theta)",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -6069,26 +6037,6 @@
         "value": 120
        }
       ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "\u0393/|\u0398|"
-      },
-      "properties": [
-       {
-        "id": "decimals",
-        "value": 2
-       },
-       {
-        "id": "custom.width",
-        "value": 75
-       },
-       {
-        "id": "description",
-        "value": "Long options only (positive gamma, negative theta): gamma per share divided by the daily theta per share, i.e. gamma bought for each $1 a day of decay. Higher = more convexity for the time paid."
-       }
-      ]
      }
     ]
    },
@@ -6125,14 +6073,13 @@
        "Value #C": 5,
        "Value #D": 7,
        "Value #E": 8,
-       "Value #F": 10,
-       "Value #H": 15,
-       "Value #I": 11,
-       "Value #J": 12,
-       "Value #K": 13,
-       "Value #L": 14,
-       "Value #M": 6,
-       "Value #N": 9
+       "Value #F": 9,
+       "Value #H": 14,
+       "Value #I": 10,
+       "Value #J": 11,
+       "Value #K": 12,
+       "Value #L": 13,
+       "Value #M": 6
       },
       "renameByName": {
        "symbol": "Symbol",
@@ -6149,8 +6096,7 @@
        "Value #J": "Gamma",
        "Value #K": "Theta",
        "Value #L": "Vega",
-       "Value #M": "Breakeven",
-       "Value #N": "\u0393/|\u0398|"
+       "Value #M": "Breakeven"
       }
      }
     }
