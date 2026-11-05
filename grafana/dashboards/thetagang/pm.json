@@ -46,6 +46,35 @@
     "includeAll": false,
     "multi": false,
     "regex": "/strategy=\"([^\"]+)\"/"
+   },
+   {
+    "name": "horizon",
+    "label": "Horizon (trading days)",
+    "type": "custom",
+    "query": "1,5,10",
+    "current": {
+     "text": "5",
+     "value": "5"
+    },
+    "options": [
+     {
+      "text": "1",
+      "value": "1",
+      "selected": false
+     },
+     {
+      "text": "5",
+      "value": "5",
+      "selected": true
+     },
+     {
+      "text": "10",
+      "value": "10",
+      "selected": false
+     }
+    ],
+    "includeAll": false,
+    "multi": false
    }
   ]
  },
@@ -1608,7 +1637,7 @@
    "id": 18,
    "type": "stat",
    "title": "Worst-case loss",
-   "description": "Phase 1 proxy: executable value down to the worst value at expiry. Phase 2: the scenario grid's worst cell. Compared with your max_loss.",
+   "description": "The scenario grid's worst cell over 1, 5 and 10 trading days, both price families (vault risk_metrics WCL_h). P0 when it exceeds the loss budget.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -2245,7 +2274,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 52,
+    "y": 67,
     "w": 24,
     "h": 1
    },
@@ -2261,7 +2290,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 53,
+    "y": 68,
     "w": 6,
     "h": 9
    },
@@ -2311,7 +2340,7 @@
    "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
    "gridPos": {
     "x": 12,
-    "y": 53,
+    "y": 68,
     "w": 12,
     "h": 9
    },
@@ -2361,7 +2390,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 62,
+    "y": 77,
     "w": 24,
     "h": 1
    },
@@ -2378,7 +2407,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 63,
+    "y": 78,
     "w": 24,
     "h": 8
    },
@@ -2464,7 +2493,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 71,
+    "y": 86,
     "w": 24,
     "h": 1
    },
@@ -2481,7 +2510,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 72,
+    "y": 87,
     "w": 24,
     "h": 19
    },
@@ -2836,7 +2865,7 @@
    },
    "gridPos": {
     "x": 6,
-    "y": 53,
+    "y": 68,
     "w": 6,
     "h": 9
    },
@@ -2873,6 +2902,920 @@
    "fieldConfig": {
     "defaults": {},
     "overrides": []
+   }
+  },
+  {
+   "id": 35,
+   "type": "row",
+   "title": "Scenarios and forward value: $strategy (Phase 2)",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 52,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 36,
+   "type": "stat",
+   "title": "WCL 1 day",
+   "description": "Worst grid loss over 1 trading day",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 53,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"wcl_1\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 37,
+   "type": "stat",
+   "title": "WCL 5 days",
+   "description": "Worst grid loss over 5 trading days",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 3,
+    "y": 53,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"wcl_5\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 38,
+   "type": "stat",
+   "title": "WCL 10 days",
+   "description": "Worst grid loss over 10 trading days",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 6,
+    "y": 53,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"wcl_10\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 39,
+   "type": "stat",
+   "title": "Stress loss",
+   "description": "Worst named stress scenario (gaps, IV shocks; VIX: spike, fade, regime shift). P0 when above the loss budget",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 9,
+    "y": 53,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"stress_loss\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 40,
+   "type": "stat",
+   "title": "Loss budget",
+   "description": "max_loss + min(0, unrealised P&L): what is left of your risk budget (vault risk_metrics)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 53,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"loss_budget\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 41,
+   "type": "stat",
+   "title": "E[P&L] 5 days",
+   "description": "Probability-weighted P&L: realised-vol forecast, zero drift, IV unchanged (M8). A model, not a promise",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 15,
+    "y": 53,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"e_pnl\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 42,
+   "type": "stat",
+   "title": "Expected Shortfall",
+   "description": "Average loss in the worst 10% of outcomes (es_alpha) under the same probabilities",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 18,
+    "y": 53,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"es\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 43,
+   "type": "stat",
+   "title": "U hold \u2212 U close",
+   "description": "Utility of holding minus closing now (vault roll_rules). Reported only, not a signal: with zero drift and IV unchanged it is negative almost by construction",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 21,
+    "y": 53,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pm{strategy=\"$strategy\",field=\"u_hold\"}) - sum(thetagang_pm{strategy=\"$strategy\",field=\"u_close\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 44,
+   "type": "table",
+   "title": "Scenario grid ($horizon trading days)",
+   "description": "P&L ($) of repricing every leg at the price move (rows; strikes are added near expiry) and IV shift (columns, IV points), after $horizon trading days, against today's model value (vault scenario_engine). Sensitivity, not probabilities. VIX options move on their own future, with VIX-sized moves (M11).",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 57,
+    "w": 11,
+    "h": 10
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm_grid{strategy=\"$strategy\",horizon=\"$horizon\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "groupingToMatrix",
+     "options": {
+      "columnField": "iv",
+      "rowField": "move",
+      "valueField": "Value"
+     }
+    },
+    {
+     "id": "convertFieldType",
+     "options": {
+      "conversions": [
+       {
+        "targetField": "move\\iv",
+        "destinationType": "number"
+       }
+      ],
+      "fields": {}
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "move\\iv",
+        "desc": true
+       }
+      ]
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "move\\iv": "Move \\ IV"
+      },
+      "indexByName": {
+       "move\\iv": 0,
+       "-20": 1,
+       "-10": 2,
+       "-5": 3,
+       "0": 4,
+       "5": 5,
+       "10": 6,
+       "20": 7
+      }
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "custom": {
+      "align": "auto",
+      "cellOptions": {
+       "type": "color-text"
+      },
+      "minWidth": 60
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Move \\ IV"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percentunit"
+       },
+       {
+        "id": "decimals",
+        "value": 1
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "auto"
+        }
+       },
+       {
+        "id": "custom.width",
+        "value": 95
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 45,
+   "type": "table",
+   "title": "Stress scenarios (1 day)",
+   "description": "Named scenarios beyond the grid, repriced over 1 trading day (vault stress_testing, M2; VIX regime scenarios M11). Sizes are hypotheses.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 11,
+    "y": 57,
+    "w": 5,
+    "h": 10
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (name) (thetagang_pm_stress{strategy=\"$strategy\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "name": "Scenario",
+       "Value": "P&L"
+      },
+      "excludeByName": {
+       "Time": true
+      }
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 0,
+     "custom": {
+      "align": "auto",
+      "cellOptions": {
+       "type": "color-text"
+      }
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Scenario"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "auto"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 46,
+   "type": "table",
+   "title": "Grid summary ($; count; ratio)",
+   "description": "Per horizon (vault scenario_engine): best, worst and median cell; adverse cells (count, sum); time decay = price and IV unchanged; IV sensitivity = IV up minus IV down one step; asymmetry = best / |worst|. The median of a grid is descriptive, not an expectation.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 16,
+    "y": 57,
+    "w": 8,
+    "h": 10
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm_grid_summary{strategy=\"$strategy\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "groupingToMatrix",
+     "options": {
+      "columnField": "horizon",
+      "rowField": "stat",
+      "valueField": "Value"
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "stat\\horizon": "Days \u2192"
+      },
+      "indexByName": {
+       "stat\\horizon": 0,
+       "1": 1,
+       "5": 2,
+       "10": 3
+      }
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 0,
+     "custom": {
+      "align": "auto",
+      "cellOptions": {
+       "type": "color-text"
+      }
+     },
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Days \u2192"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "auto"
+        }
+       },
+       {
+        "id": "custom.width",
+        "value": 170
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "best": {
+            "text": "Best cell $",
+            "index": 0
+           },
+           "worst": {
+            "text": "Worst cell $",
+            "index": 1
+           },
+           "median": {
+            "text": "Median cell $",
+            "index": 2
+           },
+           "adverse_count": {
+            "text": "Losing cells (count)",
+            "index": 3
+           },
+           "adverse_sum": {
+            "text": "Losing cells sum $",
+            "index": 4
+           },
+           "time_decay": {
+            "text": "Time decay $",
+            "index": 5
+           },
+           "iv_sensitivity": {
+            "text": "IV sensitivity $",
+            "index": 6
+           },
+           "asymmetry": {
+            "text": "Best / |worst| (ratio)",
+            "index": 7
+           }
+          }
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byRegexp",
+       "options": "^(1|5|10)$"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 1
+       }
+      ]
+     }
+    ]
    }
   }
  ]
