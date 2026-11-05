@@ -459,7 +459,7 @@
    "id": 8,
    "type": "table",
    "title": "Review queue (every strategy not on HOLD, highest priority first)",
-   "description": "The Portfolio Manager's review signals (vault rules) next to what the bot's own rules say. Click a strategy for its detail below.",
+   "description": "The Portfolio Manager's review signals (vault rules) next to what the bot's own rules say. Click a strategy for its detail below. Manager: long options (opened for a debit) or short options (opened for a credit), not the convexity class. Review at DTE is the long manager's life-scaled window; Captured is the short manager's share of the credit kept.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -477,7 +477,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "sum by (strategy, symbol, kind, cls, outcome, top, signals, bot) (thetagang_pm_info{outcome!=\"HOLD\"})",
+     "expr": "sum by (strategy, symbol, kind, manager, cls, outcome, top, signals, bot) (thetagang_pm_info{outcome!=\"HOLD\"})",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -489,7 +489,7 @@
       "uid": "prometheus"
      },
      "refId": "B",
-     "expr": "sum by (strategy) (thetagang_pm{field=\"priority\"})",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"priority\"}) and on (strategy) thetagang_pm_info{outcome!=\"HOLD\"}",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -501,7 +501,7 @@
       "uid": "prometheus"
      },
      "refId": "C",
-     "expr": "sum by (strategy) (thetagang_pm{field=\"v_exec\"})",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"v_exec\"}) and on (strategy) thetagang_pm_info{outcome!=\"HOLD\"}",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -513,7 +513,7 @@
       "uid": "prometheus"
      },
      "refId": "D",
-     "expr": "sum by (strategy) (thetagang_pm{field=\"pnl_exec\"})",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"pnl_exec\"}) and on (strategy) thetagang_pm_info{outcome!=\"HOLD\"}",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -525,7 +525,7 @@
       "uid": "prometheus"
      },
      "refId": "E",
-     "expr": "sum by (strategy) (thetagang_pm{field=\"dte_front\"})",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"dte_front\"}) and on (strategy) thetagang_pm_info{outcome!=\"HOLD\"}",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -537,7 +537,19 @@
       "uid": "prometheus"
      },
      "refId": "F",
-     "expr": "sum by (strategy) (thetagang_pm{field=\"dte_window\"})",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"dte_window\"}) and on (strategy) thetagang_pm_info{outcome!=\"HOLD\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "G",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"capture\"}) and on (strategy) thetagang_pm_info{outcome!=\"HOLD\"}",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -549,7 +561,7 @@
      "id": "joinByField",
      "options": {
       "byField": "strategy",
-      "mode": "inner"
+      "mode": "outer"
      }
     },
     {
@@ -576,7 +588,9 @@
        "Value #C": "Exec value ($)",
        "Value #D": "P&L exec ($)",
        "Value #E": "DTE",
-       "Value #F": "Review at DTE"
+       "Value #F": "Review at DTE",
+       "manager": "Manager",
+       "Value #G": "Captured"
       },
       "indexByName": {
        "strategy": 0,
@@ -584,14 +598,16 @@
        "outcome": 2,
        "signals": 3,
        "bot": 4,
-       "cls": 5,
-       "kind": 6,
-       "Value #C": 7,
-       "Value #D": 8,
-       "Value #E": 9,
-       "Value #F": 10,
-       "symbol": 11,
-       "Value #B": 12
+       "manager": 5,
+       "cls": 6,
+       "kind": 7,
+       "Value #C": 8,
+       "Value #D": 9,
+       "Value #E": 10,
+       "Value #F": 11,
+       "Value #G": 12,
+       "symbol": 13,
+       "Value #B": 14
       },
       "excludeByName": {
        "symbol": true
@@ -902,6 +918,34 @@
         "value": true
        }
       ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Manager"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 110
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Captured"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percentunit"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       }
+      ]
      }
     ]
    }
@@ -941,7 +985,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "sum by (strategy, structure, kind, cls, outcome, bot) (thetagang_pm_info{strategy=\"$strategy\"})",
+     "expr": "sum by (strategy, structure, kind, manager, cls, outcome, bot) (thetagang_pm_info{strategy=\"$strategy\"})",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -966,15 +1010,17 @@
        "kind": "Kind",
        "cls": "Convexity class",
        "outcome": "PM outcome",
-       "bot": "Bot rules say"
+       "bot": "Bot rules say",
+       "manager": "Manager"
       },
       "indexByName": {
        "strategy": 0,
        "structure": 1,
        "kind": 2,
-       "cls": 3,
-       "outcome": 4,
-       "bot": 5
+       "manager": 3,
+       "cls": 4,
+       "outcome": 5,
+       "bot": 6
       },
       "excludeByName": {}
      }
@@ -1621,7 +1667,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 28,
+    "y": 32,
     "w": 10,
     "h": 6
    },
@@ -1754,7 +1800,7 @@
    },
    "gridPos": {
     "x": 10,
-    "y": 28,
+    "y": 32,
     "w": 14,
     "h": 6
    },
@@ -1930,7 +1976,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 34,
+    "y": 38,
     "w": 12,
     "h": 8
    },
@@ -1979,7 +2025,7 @@
    },
    "gridPos": {
     "x": 12,
-    "y": 34,
+    "y": 38,
     "w": 12,
     "h": 8
    },
@@ -2135,7 +2181,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 42,
+    "y": 46,
     "w": 24,
     "h": 6
    },
@@ -2188,7 +2234,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 48,
+    "y": 52,
     "w": 24,
     "h": 1
    },
@@ -2197,15 +2243,15 @@
   {
    "id": 25,
    "type": "piechart",
-   "title": "Convexity class mix",
+   "title": "Convexity class mix (net greeks)",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
    },
    "gridPos": {
     "x": 0,
-    "y": 49,
-    "w": 8,
+    "y": 53,
+    "w": 6,
     "h": 9
    },
    "targets": [
@@ -2253,9 +2299,9 @@
    },
    "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
    "gridPos": {
-    "x": 8,
-    "y": 49,
-    "w": 16,
+    "x": 12,
+    "y": 53,
+    "w": 12,
     "h": 9
    },
    "targets": [
@@ -2304,7 +2350,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 58,
+    "y": 62,
     "w": 24,
     "h": 1
    },
@@ -2321,7 +2367,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 59,
+    "y": 63,
     "w": 24,
     "h": 8
    },
@@ -2398,6 +2444,424 @@
       ]
      }
     ]
+   }
+  },
+  {
+   "id": 29,
+   "type": "row",
+   "title": "Parameters",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 71,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 30,
+   "type": "table",
+   "title": "Parameters in use ([pm] in the TOML)",
+   "description": "Every setting the Portfolio Manager decides with, as the monitor uses it now: the vault register ID (assumptions_register; all hypotheses) and whether it is the default or your [pm] setting. Change them in the TOML and restart the monitor.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 72,
+    "w": 24,
+    "h": 27
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (name, value, vault_id, source, meaning) (thetagang_pm_param)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!(Time.*|Value)$).*$"
+      }
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "name": "Setting",
+       "value": "Value",
+       "vault_id": "Vault ID",
+       "source": "Source",
+       "meaning": "What it decides"
+      },
+      "indexByName": {
+       "name": 0,
+       "value": 1,
+       "vault_id": 2,
+       "source": 3,
+       "meaning": 4
+      },
+      "excludeByName": {}
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "minWidth": 50,
+      "align": "auto"
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Setting"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 190
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Value"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 400
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Vault ID"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 80
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Source"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "your setting": {
+            "color": "blue",
+            "index": 0
+           },
+           "default": {
+            "color": "text",
+            "index": 1
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 110
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 31,
+   "type": "stat",
+   "title": "Credit captured (short options)",
+   "description": "Share of the credit kept: (credit - cost to buy back now) / credit, at executable prices. S1: 50% review, 70% strong consideration, 80% default close, 90-100% normally close. Strategies opened for a credit only.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 28,
+    "w": 8,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"capture\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 0,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 0.5
+       },
+       {
+        "color": "orange",
+        "value": 0.7
+       },
+       {
+        "color": "red",
+        "value": 0.8
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 32,
+   "type": "stat",
+   "title": "Loss multiple (short options)",
+   "description": "(cost to buy back now - credit) / credit: 0 at breakeven, 1 when the loss equals the credit, negative in profit. S3 reviews at 1x / 2x / 3x. Strategies opened for a credit only.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 8,
+    "y": 28,
+    "w": 8,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"loss_multiple\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 2,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "orange",
+        "value": 1
+       },
+       {
+        "color": "red",
+        "value": 2
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 33,
+   "type": "stat",
+   "title": "Premium left per $ of risk (short options)",
+   "description": "Remaining premium / remaining risk = cost to buy back now / worst-case loss (phase 1: down to the expiry floor, defined risk only). It falls late in a trade: each extra $ of premium costs more risk. Strategies opened for a credit only.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 16,
+    "y": 28,
+    "w": 8,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"premium_to_risk\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 2,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "text",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 34,
+   "type": "piechart",
+   "title": "Manager mix (how strategies were opened)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 6,
+    "y": 53,
+    "w": 6,
+    "h": 9
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "count by (manager) (thetagang_pm_info)",
+     "legendFormat": "{{manager}}",
+     "instant": true,
+     "range": false,
+     "format": "time_series"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "values": false
+    },
+    "pieType": "donut",
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "values": [
+      "value"
+     ]
+    }
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
    }
   }
  ]

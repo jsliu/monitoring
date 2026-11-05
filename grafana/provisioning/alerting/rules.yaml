@@ -664,7 +664,7 @@
             "account": "live"
           },
           "annotations": {
-            "summary": "{{ $labels.strategy }} ({{ $labels.structure }}): {{ $labels.outcome }}. {{ $labels.signals }}. Bot rules say: {{ $labels.bot }}. Open the Portfolio Manager to review."
+            "summary": "{{ $labels.strategy }} ({{ $labels.structure }}, {{ $labels.manager }} manager): {{ $labels.outcome }}. {{ $labels.signals }}. Bot rules say: {{ $labels.bot }}. Open the Portfolio Manager to review."
           },
           "data": [
             {
