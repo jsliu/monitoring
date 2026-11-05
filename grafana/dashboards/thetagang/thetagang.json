@@ -5193,6 +5193,11 @@
             "color": "green",
             "text": "\u2013",
             "index": 3
+           },
+           "data": {
+            "color": "purple",
+            "text": "data",
+            "index": 4
            }
           }
          }

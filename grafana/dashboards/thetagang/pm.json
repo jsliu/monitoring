@@ -65,7 +65,7 @@
    "id": 2,
    "type": "stat",
    "title": "P0 hard",
-   "description": "Thesis invalid, risk budget breached or data unreliable (vault: exit_signals).",
+   "description": "Strategies with a hard P0 review: thesis invalidated or risk budget breached. Bad prices are counted under Data flags instead.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -83,7 +83,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "thetagang_pm_signals{priority=\"P0\"}",
+     "expr": "count(thetagang_pm_info{top=\"P0\"}) or vector(0)",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -459,7 +459,7 @@
    "id": 8,
    "type": "table",
    "title": "Review queue (every strategy not on HOLD, highest priority first)",
-   "description": "The Portfolio Manager's review signals (vault rules) next to what the bot's own rules say. Click a strategy for its detail below. Manager: long options (opened for a debit) or short options (opened for a credit), not the convexity class. Review at DTE is the long manager's life-scaled window; Captured is the short manager's share of the credit kept.",
+   "description": "The Portfolio Manager's review signals (vault rules) next to what the bot's own rules say. Click a strategy for its detail below. Manager: long options (opened for a debit) or short options (opened for a credit), not the convexity class. Review at DTE is the long manager's life-scaled window; Captured is the short manager's share of the credit kept. Order: what you can act on first. Priority is the most urgent signal other than bad data (\"data\" when bad data is the only one); real P0, then P1, then P2, each with clean rows before rows whose prices are flagged; rows with only bad data last. A flagged row still says REVIEW - data unreliable: check its prices before acting.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -689,6 +689,11 @@
             "color": "green",
             "text": "\u2013",
             "index": 3
+           },
+           "data": {
+            "color": "purple",
+            "text": "data",
+            "index": 4
            }
           }
          }
@@ -772,6 +777,10 @@
        {
         "id": "custom.width",
         "value": 520
+       },
+       {
+        "id": "custom.wrapText",
+        "value": true
        }
       ]
      },
