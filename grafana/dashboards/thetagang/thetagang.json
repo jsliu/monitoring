@@ -6569,5 +6569,14 @@
   }
  ],
  "editable": true,
- "graphTooltip": 1
+ "graphTooltip": 1,
+ "links": [
+  {
+   "title": "Portfolio Manager",
+   "type": "link",
+   "url": "/d/thetagang-pm/portfolio-manager?${__url_time_range}",
+   "icon": "dashboard",
+   "tooltip": "Review queue and per-strategy detail (decision support)"
+  }
+ ]
 }

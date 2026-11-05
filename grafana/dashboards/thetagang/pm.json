@@ -1,0 +1,2404 @@
+{
+ "uid": "thetagang-pm",
+ "title": "Portfolio Manager",
+ "tags": [
+  "thetagang",
+  "pm"
+ ],
+ "timezone": "browser",
+ "refresh": "1m",
+ "schemaVersion": 41,
+ "version": 1,
+ "editable": true,
+ "time": {
+  "from": "now-30d",
+  "to": "now"
+ },
+ "description": "Decision support per strategy, from the PM Knowledge Base vault: review signals (P0/P1/P2), executable value, convexity class, gamma/theta efficiency, journal history. Never trades.",
+ "links": [
+  {
+   "title": "thetagang",
+   "type": "link",
+   "url": "/d/thetagang/thetagang?${__url_time_range}",
+   "icon": "dashboard",
+   "tooltip": "Account and book overview"
+  }
+ ],
+ "templating": {
+  "list": [
+   {
+    "name": "strategy",
+    "label": "Strategy",
+    "type": "query",
+    "datasource": {
+     "type": "prometheus",
+     "uid": "prometheus"
+    },
+    "query": {
+     "query": "label_values(thetagang_pm_info, strategy)",
+     "refId": "strategy"
+    },
+    "definition": "label_values(thetagang_pm_info, strategy)",
+    "refresh": 2,
+    "sort": 1,
+    "current": {},
+    "includeAll": false,
+    "multi": false
+   }
+  ]
+ },
+ "panels": [
+  {
+   "id": 1,
+   "type": "row",
+   "title": "Review",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 0,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 2,
+   "type": "stat",
+   "title": "P0 hard",
+   "description": "Thesis invalid, risk budget breached or data unreliable (vault: exit_signals).",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 1,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm_signals{priority=\"P0\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 0,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "red",
+        "value": 1
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 3,
+   "type": "stat",
+   "title": "P1 time / profit",
+   "description": "Profit levels, DTE window, short leg near expiry.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 4,
+    "y": 1,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm_signals{priority=\"P1\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 0,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "orange",
+        "value": 1
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 4,
+   "type": "stat",
+   "title": "P2 drift / efficiency",
+   "description": "Delta, class change, GT_h below 1, low remaining reward.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 8,
+    "y": 1,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm_signals{priority=\"P2\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 0,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "yellow",
+        "value": 1
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 5,
+   "type": "stat",
+   "title": "Strategies",
+   "description": "",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 1,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm_strategies",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 0,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 6,
+   "type": "stat",
+   "title": "Data flags",
+   "description": "Strategies with a missing, stale or wide quote, or no greeks: their outcome is REVIEW - data unreliable.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 16,
+    "y": 1,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "count(thetagang_pm_info{flags!=\"-\"}) or vector(0)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 0,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "green",
+        "value": null
+       },
+       {
+        "color": "purple",
+        "value": 1
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 7,
+   "type": "stat",
+   "title": "Cost to close all now",
+   "description": "Mid value minus executable value (sell at the bid, buy back at the ask), summed over strategies with quotes.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 20,
+    "y": 1,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pm{field=\"liquidity_cost\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 8,
+   "type": "table",
+   "title": "Review queue (every strategy not on HOLD, highest priority first)",
+   "description": "The Portfolio Manager's review signals (vault rules) next to what the bot's own rules say. Click a strategy for its detail below.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 5,
+    "w": 24,
+    "h": 14
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (strategy, symbol, kind, cls, outcome, top, signals, bot) (thetagang_pm_info{outcome!=\"HOLD\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"priority\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "C",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"v_exec\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "D",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"pnl_exec\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "E",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"dte_front\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "F",
+     "expr": "sum by (strategy) (thetagang_pm{field=\"dte_window\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "joinByField",
+     "options": {
+      "byField": "strategy",
+      "mode": "inner"
+     }
+    },
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!(Time.*|Value #A)$).*$"
+      }
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "strategy": "Strategy",
+       "symbol": "Symbol",
+       "kind": "Kind",
+       "cls": "Class",
+       "top": "Priority",
+       "outcome": "PM outcome",
+       "signals": "Signals",
+       "bot": "Bot rules say",
+       "Value #B": "rank",
+       "Value #C": "Exec value ($)",
+       "Value #D": "P&L exec ($)",
+       "Value #E": "DTE",
+       "Value #F": "Review at DTE"
+      },
+      "indexByName": {
+       "strategy": 0,
+       "top": 1,
+       "outcome": 2,
+       "signals": 3,
+       "bot": 4,
+       "cls": 5,
+       "kind": 6,
+       "Value #C": 7,
+       "Value #D": 8,
+       "Value #E": 9,
+       "Value #F": 10,
+       "symbol": 11,
+       "Value #B": 12
+      },
+      "excludeByName": {
+       "symbol": true
+      }
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "sortBy": [
+     {
+      "displayName": "rank",
+      "desc": true
+     }
+    ]
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "minWidth": 50,
+      "align": "auto"
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Strategy"
+      },
+      "properties": [
+       {
+        "id": "links",
+        "value": [
+         {
+          "title": "Open ${__value.raw}",
+          "url": "/d/thetagang-pm/portfolio-manager?var-strategy=${__value.raw}&${__url_time_range}"
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 200
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Priority"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "P0": {
+            "color": "red",
+            "index": 0
+           },
+           "P1": {
+            "color": "orange",
+            "index": 1
+           },
+           "P2": {
+            "color": "yellow",
+            "index": 2
+           },
+           "-": {
+            "color": "green",
+            "text": "\u2013",
+            "index": 3
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 70
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "PM outcome"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^CLOSE.*",
+           "result": {
+            "color": "red",
+            "index": 0
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": ".*data unreliable",
+           "result": {
+            "color": "purple",
+            "index": 1
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^REVIEW.*",
+           "result": {
+            "color": "orange",
+            "index": 2
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^HOLD",
+           "result": {
+            "color": "green",
+            "index": 3
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 190
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Signals"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 520
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Bot rules say"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 170
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Class"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 120
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Kind"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 110
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Exec value ($)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "locale"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "P&L exec ($)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "locale"
+       },
+       {
+        "id": "decimals",
+        "value": 0
+       },
+       {
+        "id": "thresholds",
+        "value": {
+         "mode": "absolute",
+         "steps": [
+          {
+           "color": "red",
+           "value": null
+          },
+          {
+           "color": "green",
+           "value": 0
+          }
+         ]
+        }
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "thresholds"
+        }
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "DTE"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 55
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Review at DTE"
+      },
+      "properties": [
+       {
+        "id": "description",
+        "value": "The vault's DTE review window for this strategy's original life (T3)."
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "rank"
+      },
+      "properties": [
+       {
+        "id": "custom.hidden",
+        "value": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 9,
+   "type": "row",
+   "title": "Strategy: $strategy",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 19,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 10,
+   "type": "table",
+   "title": "Overview",
+   "description": "",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 20,
+    "w": 24,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (strategy, structure, kind, cls, outcome, bot) (thetagang_pm_info{strategy=\"$strategy\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!(Time.*|Value)$).*$"
+      }
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "strategy": "Strategy",
+       "structure": "Legs",
+       "kind": "Kind",
+       "cls": "Convexity class",
+       "outcome": "PM outcome",
+       "bot": "Bot rules say"
+      },
+      "indexByName": {
+       "strategy": 0,
+       "structure": 1,
+       "kind": 2,
+       "cls": 3,
+       "outcome": 4,
+       "bot": 5
+      },
+      "excludeByName": {}
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "minWidth": 50,
+      "align": "auto"
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "PM outcome"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^CLOSE.*",
+           "result": {
+            "color": "red",
+            "index": 0
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": ".*data unreliable",
+           "result": {
+            "color": "purple",
+            "index": 1
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^REVIEW.*",
+           "result": {
+            "color": "orange",
+            "index": 2
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^HOLD",
+           "result": {
+            "color": "green",
+            "index": 3
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 200
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Strategy"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 200
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Kind"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 120
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Convexity class"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 140
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 11,
+   "type": "stat",
+   "title": "Mid value",
+   "description": "",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 24,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"v_mid\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 12,
+   "type": "stat",
+   "title": "Executable value",
+   "description": "Sell long legs at the bid, buy back shorts at the ask.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 3,
+    "y": 24,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"v_exec\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 13,
+   "type": "stat",
+   "title": "Cost to close now",
+   "description": "",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 6,
+    "y": 24,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"liquidity_cost\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 14,
+   "type": "stat",
+   "title": "P&L (executable)",
+   "description": "",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 9,
+    "y": 24,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"pnl_exec\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "red",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 15,
+   "type": "stat",
+   "title": "GT 5-day",
+   "description": "Long convexity only: expected gamma gain over 5 trading days / theta paid, at forecast realised vol. Below 1: decay beats gamma (vault: gamma_theta_efficiency).",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 24,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"gt_5\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 2,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "orange",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 1
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 16,
+   "type": "stat",
+   "title": "Breakeven vol vs realised",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "description": "sigma_BE: the realised volatility at which gamma pays for theta over 5 days, vs the 21-day realised vol forecast. Long convexity wins when realised > breakeven.",
+   "gridPos": {
+    "x": 15,
+    "y": 24,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"sigma_be_5\"}",
+     "legendFormat": "breakeven",
+     "instant": true,
+     "range": false,
+     "format": "time_series"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"sigma_f\"}",
+     "legendFormat": "realised",
+     "instant": true,
+     "range": false,
+     "format": "time_series"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "value",
+    "graphMode": "none",
+    "textMode": "value_and_name"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 1,
+     "noValue": "\u2013"
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 17,
+   "type": "stat",
+   "title": "Remaining reward / risk",
+   "description": "(best value at expiry - executable value) / (executable value - worst value at expiry). Defined-risk strategies only.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 18,
+    "y": 24,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"remaining_rr\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 2,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "orange",
+        "value": null
+       },
+       {
+        "color": "green",
+        "value": 0.25
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 18,
+   "type": "stat",
+   "title": "Worst-case loss",
+   "description": "Phase 1 proxy: executable value down to the worst value at expiry. Phase 2: the scenario grid's worst cell. Compared with your max_loss.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 21,
+    "y": 24,
+    "w": 3,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"worst_case_loss\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 19,
+   "type": "table",
+   "title": "Signals",
+   "description": "",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 28,
+    "w": 10,
+    "h": 6
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (priority, name, detail) (thetagang_pm_signal{strategy=\"$strategy\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!(Time.*|Value)$).*$"
+      }
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "priority": "Priority",
+       "name": "Signal",
+       "detail": "Detail"
+      },
+      "indexByName": {
+       "priority": 0,
+       "name": 1,
+       "detail": 2
+      },
+      "excludeByName": {}
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "sortBy": [
+     {
+      "displayName": "Priority"
+     }
+    ]
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "minWidth": 50,
+      "align": "auto"
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Priority"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "P0": {
+            "color": "red",
+            "index": 0
+           },
+           "P1": {
+            "color": "orange",
+            "index": 1
+           },
+           "P2": {
+            "color": "yellow",
+            "index": 2
+           },
+           "-": {
+            "color": "green",
+            "text": "\u2013",
+            "index": 3
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 70
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Signal"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 150
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 20,
+   "type": "table",
+   "title": "Thesis and budget (journal)",
+   "description": "Your inputs come from [[pm.strategies]] in the TOML (by strategy ID). Positions held before the journal started have an estimated entry.",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "journal"
+   },
+   "gridPos": {
+    "x": 10,
+    "y": 28,
+    "w": 14,
+    "h": 6
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "journal"
+     },
+     "refId": "A",
+     "rawSql": "SELECT to_char(entry_date, 'YYYY-MM-DD') AS \"Entry\", CASE WHEN entry_estimated THEN 'estimated' ELSE '' END AS \" \", net_debit AS \"Net debit ($)\", initial_dte AS \"DTE at entry\", thesis AS \"Thesis\", invalidation_below AS \"Invalid below\", invalidation_above AS \"Invalid above\", target AS \"Target ($)\", max_loss AS \"Max loss ($)\", thesis_valid AS \"Thesis valid\", status AS \"Status\" FROM strategies WHERE id = '$strategy'",
+     "format": "table",
+     "editorMode": "code",
+     "rawQuery": true
+    }
+   ],
+   "transformations": [],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "minWidth": 50,
+      "align": "auto"
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Entry"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 95
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": " "
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 75
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Net debit ($)"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 95
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "DTE at entry"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 90
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Thesis"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 240
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Invalid below"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 95
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Invalid above"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 95
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Target ($)"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 80
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Max loss ($)"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 85
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Thesis valid"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 85
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Status"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 65
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 21,
+   "type": "timeseries",
+   "title": "P&L history (end of each day)",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "journal"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 34,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "journal"
+     },
+     "refId": "A",
+     "rawSql": "SELECT day::timestamptz AS time, pnl_exec AS \"executable\", pnl_mid AS \"mid\" FROM snapshots WHERE strategy_id = '$strategy' AND $__timeFilter(day::timestamptz) ORDER BY day",
+     "format": "time_series",
+     "editorMode": "code",
+     "rawQuery": true
+    }
+   ],
+   "options": {
+    "legend": {
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "multi"
+    }
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "custom": {
+      "drawStyle": "line",
+      "pointSize": 5,
+      "showPoints": "always"
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 22,
+   "type": "table",
+   "title": "Decision log",
+   "description": "One row each time this strategy's outcome or signals changed.",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "journal"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 34,
+    "w": 12,
+    "h": 8
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "journal"
+     },
+     "refId": "A",
+     "rawSql": "SELECT to_char(at AT TIME ZONE 'America/New_York', 'YYYY-MM-DD HH24:MI') AS \"When (NY)\", outcome AS \"PM outcome\", (SELECT string_agg((e->>'priority') || ' ' || (e->>'name') || ': ' || (e->>'detail'), '; ')  FROM jsonb_array_elements(signals) e) AS \"Signals\", bot_action AS \"Bot rules said\", your_action AS \"You did\" FROM decisions WHERE strategy_id = '$strategy' ORDER BY at DESC LIMIT 100",
+     "format": "table",
+     "editorMode": "code",
+     "rawQuery": true
+    }
+   ],
+   "transformations": [],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "minWidth": 50,
+      "align": "auto"
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "PM outcome"
+      },
+      "properties": [
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^CLOSE.*",
+           "result": {
+            "color": "red",
+            "index": 0
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": ".*data unreliable",
+           "result": {
+            "color": "purple",
+            "index": 1
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^REVIEW.*",
+           "result": {
+            "color": "orange",
+            "index": 2
+           }
+          }
+         },
+         {
+          "type": "regex",
+          "options": {
+           "pattern": "^HOLD",
+           "result": {
+            "color": "green",
+            "index": 3
+           }
+          }
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 190
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "When (NY)"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 130
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Signals"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 330
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Bot rules said"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 110
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "You did"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 80
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 23,
+   "type": "table",
+   "title": "Legs (journal)",
+   "description": "Open legs first; closed legs show the roll history.",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "journal"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 42,
+    "w": 24,
+    "h": 6
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "journal"
+     },
+     "refId": "A",
+     "rawSql": "SELECT label AS \"Contract\", qty AS \"Qty\", entry_price AS \"Entry price\", to_char(opened_on, 'YYYY-MM-DD') AS \"Opened\", to_char(closed_on, 'YYYY-MM-DD') AS \"Closed\" FROM strategy_legs WHERE strategy_id = '$strategy' ORDER BY closed_on IS NOT NULL, closed_on DESC, label",
+     "format": "table",
+     "editorMode": "code",
+     "rawQuery": true
+    }
+   ],
+   "transformations": [],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "minWidth": 50,
+      "align": "auto"
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Contract"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 220
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 24,
+   "type": "row",
+   "title": "Book",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 48,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 25,
+   "type": "piechart",
+   "title": "Convexity class mix",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 49,
+    "w": 8,
+    "h": 9
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "count by (cls) (thetagang_pm_info)",
+     "legendFormat": "{{cls}}",
+     "instant": true,
+     "range": false,
+     "format": "time_series"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "values": false
+    },
+    "pieType": "donut",
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "values": [
+      "value"
+     ]
+    }
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   }
+  },
+  {
+   "id": 26,
+   "type": "barchart",
+   "title": "Executable value by underlying (concentration)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
+   "gridPos": {
+    "x": 8,
+    "y": 49,
+    "w": 16,
+    "h": 9
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sort_desc(sum by (symbol) (abs(thetagang_pm{field=\"v_exec\"}) * on (strategy) group_left (symbol) thetagang_pm_info))",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!Time).*$"
+      }
+     }
+    }
+   ],
+   "options": {
+    "orientation": "horizontal",
+    "xField": "symbol",
+    "showValue": "auto",
+    "legend": {
+     "showLegend": false
+    }
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD"
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 27,
+   "type": "row",
+   "title": "Data quality",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 58,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 28,
+   "type": "table",
+   "title": "Strategies with unreliable data",
+   "description": "Missing, crossed, stale or wide quotes, zero bids, no greeks (vault: data_quality_controls). Before the open most options show here.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 59,
+    "w": 24,
+    "h": 8
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (strategy, flags) (thetagang_pm_info{flags!=\"-\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!(Time.*|Value)$).*$"
+      }
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "strategy": "Strategy",
+       "flags": "Flags"
+      },
+      "indexByName": {
+       "strategy": 0,
+       "flags": 1
+      },
+      "excludeByName": {}
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "minWidth": 50,
+      "align": "auto"
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Strategy"
+      },
+      "properties": [
+       {
+        "id": "links",
+        "value": [
+         {
+          "title": "Open ${__value.raw}",
+          "url": "/d/thetagang-pm/portfolio-manager?var-strategy=${__value.raw}&${__url_time_range}"
+         }
+        ]
+       },
+       {
+        "id": "custom.width",
+        "value": 200
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}

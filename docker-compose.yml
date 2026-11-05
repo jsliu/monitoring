@@ -28,6 +28,9 @@ services:
       GF_AUTH_ANONYMOUS_ENABLED: "false"
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_ANALYTICS_REPORTING_ENABLED: "false"
+      # read-only login to the thetagang Portfolio Manager journal (Postgres on the host)
+      JOURNAL_GRAFANA_PASSWORD: ${JOURNAL_GRAFANA_PASSWORD:-}
+    extra_hosts: ["host.docker.internal:host-gateway"]
     volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro  # one subfolder per Grafana folder

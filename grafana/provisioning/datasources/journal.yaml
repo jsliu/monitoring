@@ -1,0 +1,22 @@
+{
+  "apiVersion": 1,
+  "datasources": [
+    {
+      "name": "Journal",
+      "uid": "journal",
+      "type": "grafana-postgresql-datasource",
+      "access": "proxy",
+      "url": "host.docker.internal:5432",
+      "user": "grafana_ro",
+      "jsonData": {
+        "database": "thetagang",
+        "sslmode": "disable",
+        "postgresVersion": 1600,
+        "timescaledb": false
+      },
+      "secureJsonData": {
+        "password": "$JOURNAL_GRAFANA_PASSWORD"
+      }
+    }
+  ]
+}

@@ -26,7 +26,7 @@ def _rules():
 
 def test_every_provisioning_file_and_dashboard_parses_as_json():
     files = [p for p in GRAFANA.rglob("*") if p.is_file() and p.name != "contact-point.yaml"]  # that one is generated
-    assert len(files) == 8 and all(isinstance(_json(p), dict) for p in files)
+    assert len(files) == 10 and all(isinstance(_json(p), dict) for p in files)
 
 
 def test_each_project_has_its_own_grafana_folder():
@@ -138,9 +138,12 @@ def test_env_is_read_as_text_never_run_as_shell_code(tmp_path):
 
 
 def test_grafana_gets_only_its_password():
+    """Its admin password and the journal's read-only login; never Telegram's."""
     compose = (ROOT / "docker-compose.yml").read_text()
     assert "env_file" not in compose and "TELEGRAM" not in compose
     assert "GF_SECURITY_ADMIN_PASSWORD: ${GF_SECURITY_ADMIN_PASSWORD" in compose
+    assert re.findall(r"^\s+([A-Z_]*PASSWORD):", compose, re.M) == [
+        "GF_SECURITY_ADMIN_PASSWORD", "JOURNAL_GRAFANA_PASSWORD"]
 
 
 def test_env_example_says_the_grafana_password_applies_at_the_first_start_only():
