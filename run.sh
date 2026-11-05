@@ -10,7 +10,9 @@
 #   ./run.sh render      # only (re)write Grafana's Telegram contact point from .env
 #
 # Grafana 11.3 turns an env-substituted numeric chat id into a number and then rejects it, so the contact point is
-# rendered from .env into a git-ignored file (mode 600) with the values quoted, before Grafana starts.
+# rendered from .env into a git-ignored file (mode 600) with the values quoted, before Grafana starts. Its message is
+# the "telegram.readable" template (grafana/provisioning/alerting/templates.yaml): one line per alert -- project, title,
+# summary, New York start time -- instead of Grafana's default dump of labels, query values and silence links.
 
 set -euo pipefail
 
@@ -64,6 +66,7 @@ contactPoints:
         settings:
           bottoken: '${TELEGRAM_BOT_TOKEN}'
           chatid: '${TELEGRAM_CHAT_ID}'
+          message: '{{ template "telegram.readable" . }}'
 YAML
 )
     if cmp -s "$tmp" "$CONTACT_POINT"; then rm -f "$tmp"; return 1; fi  # unchanged

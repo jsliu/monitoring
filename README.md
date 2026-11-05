@@ -35,7 +35,7 @@ other alert stays silent without data.
 | `prometheus.yml` | the three scrape jobs above |
 | `grafana/dashboards/intraday/portfolio.json` | Grafana folder **Intraday**: *Intraday paper book* |
 | `grafana/dashboards/thetagang/thetagang.json` | Grafana folder **thetagang**: *thetagang* |
-| `grafana/provisioning/` | datasource, one dashboard provider per folder, 13 alert rules (6 intraday, 7 thetagang) and their New York-time windows |
+| `grafana/provisioning/` | datasource, one dashboard provider per folder, 14 alert rules (6 intraday on the paper account, 8 thetagang on the live account), their New York-time windows, and `alerting/templates.yaml`: the Telegram message (project, title, summary, New York start time per alert) |
 | `run.sh` | the launcher; renders the Telegram contact point from `.env` into a git-ignored file (mode 600) before Grafana starts, since Grafana rejects an env-substituted numeric chat id |
 | `test_config.py` | config checks: `python3 -m pytest` with any Python that has pytest |
 
