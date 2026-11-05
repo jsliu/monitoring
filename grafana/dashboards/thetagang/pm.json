@@ -2462,8 +2462,8 @@
   {
    "id": 30,
    "type": "table",
-   "title": "Parameters in use ([pm] in the TOML)",
-   "description": "Every setting the Portfolio Manager decides with, as the monitor uses it now: the vault register ID (assumptions_register; all hypotheses) and whether it is the default or your [pm] setting. Change them in the TOML and restart the monitor.",
+   "title": "Trading rules in use ([pm] in the TOML)",
+   "description": "The settings that decide reviews and the bot's roll/close orders: profit, DTE, delta, efficiency and loss levels for both managers, and decide. Each with its vault register ID (assumptions_register; all hypotheses) and whether it is the default or your [pm] setting. Model and data settings (T7 tolerances, T9 quote limits, M1, M6), the superseded T2 and journal still act from the TOML but are not listed. Change them in the TOML and restart the monitor.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -2472,7 +2472,7 @@
     "x": 0,
     "y": 72,
     "w": 24,
-    "h": 27
+    "h": 19
    },
    "targets": [
     {
@@ -2481,7 +2481,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "sum by (name, value, vault_id, source, meaning) (thetagang_pm_param)",
+     "expr": "sum by (name, value, vault_id, source, meaning) (thetagang_pm_param{vault_id!~\"T2|T7|T9|M[0-9]+\", name!=\"journal\"})",
      "legendFormat": "",
      "instant": true,
      "range": false,
