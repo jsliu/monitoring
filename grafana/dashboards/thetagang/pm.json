@@ -2274,7 +2274,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 67,
+    "y": 79,
     "w": 24,
     "h": 1
    },
@@ -2290,7 +2290,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 68,
+    "y": 80,
     "w": 6,
     "h": 9
    },
@@ -2340,7 +2340,7 @@
    "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
    "gridPos": {
     "x": 12,
-    "y": 68,
+    "y": 80,
     "w": 12,
     "h": 9
    },
@@ -2390,7 +2390,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 77,
+    "y": 89,
     "w": 24,
     "h": 1
    },
@@ -2407,7 +2407,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 78,
+    "y": 90,
     "w": 24,
     "h": 8
    },
@@ -2493,7 +2493,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 86,
+    "y": 98,
     "w": 24,
     "h": 1
    },
@@ -2510,7 +2510,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 87,
+    "y": 99,
     "w": 24,
     "h": 19
    },
@@ -2865,7 +2865,7 @@
    },
    "gridPos": {
     "x": 6,
-    "y": 68,
+    "y": 80,
     "w": 6,
     "h": 9
    },
@@ -3812,6 +3812,414 @@
        {
         "id": "decimals",
         "value": 1
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 47,
+   "type": "row",
+   "title": "HOLD / CLOSE / ROLL (reported, not a signal)",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 67,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 49,
+   "type": "table",
+   "title": "The model's view, every strategy",
+   "description": "The highest utility of HOLD, CLOSE and the best roll (vault roll_rules), from the forward value above: zero drift, IV unchanged (M8). Under those probabilities holding rarely beats cash after tail and capital costs, so expect mostly CLOSE until IV changes and a directional view enter the model. Reported, never a signal or an order. '\u2013': no probabilities or quotes.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 68,
+    "w": 9,
+    "h": 11
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (strategy, view, best, scanned) (thetagang_pm_view)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!(Time.*|Value)$).*$"
+      }
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "strategy": "Strategy",
+       "view": "View",
+       "best": "Best roll",
+       "scanned": "Scanned"
+      },
+      "indexByName": {
+       "strategy": 0,
+       "view": 1,
+       "scanned": 2,
+       "best": 3
+      },
+      "excludeByName": {}
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm",
+    "sortBy": [
+     {
+      "displayName": "Strategy"
+     }
+    ]
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "align": "auto",
+      "minWidth": 50
+     },
+     "noValue": " "
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "View"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 70
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "ROLL": {
+            "color": "blue",
+            "index": 0
+           },
+           "CLOSE": {
+            "color": "orange",
+            "index": 1
+           },
+           "HOLD": {
+            "color": "green",
+            "index": 2
+           },
+           "-": {
+            "text": "\u2013",
+            "color": "text",
+            "index": 3
+           }
+          }
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Scanned"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 75
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Strategy"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 170
+       },
+       {
+        "id": "links",
+        "value": [
+         {
+          "title": "Review this strategy",
+          "url": "/d/thetagang-pm/portfolio-manager?var-strategy=${__value.raw}&${__url_time_range}"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": 48,
+   "type": "table",
+   "title": "Roll candidates ($): $strategy",
+   "description": "The same structure at later expiries and shifted strikes (vault roll_rules), each judged as a new trade at executable prices: cost to open, its own scenario risk, and its utility after closing the old strategy. U roll = its utility - the cost of closing today's; vs hold = U roll - U hold. A strategy not on HOLD is scanned about every 30 minutes (roll_rescan_mins). Reported, never an order; VIX options have no utility (no probabilities), so compare their risk and cost.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 9,
+    "y": 68,
+    "w": 15,
+    "h": 11
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (candidate, fails) (thetagang_pm_roll_info{strategy=\"$strategy\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "B",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"net_open\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "C",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"open_cost\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "D",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"wcl_5\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "E",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"wcl_10\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "F",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"stress_loss\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "G",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"e_pnl\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "H",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"es\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "I",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"u_roll\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "J",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"roll_score\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "joinByField",
+     "options": {
+      "byField": "candidate",
+      "mode": "outer"
+     }
+    },
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!(Time.*|Value #A)$).*$"
+      }
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "renameByName": {
+       "candidate": "Candidate",
+       "fails": "Can't recommend",
+       "Value #B": "Open",
+       "Value #C": "Cost",
+       "Value #D": "WCL 5d",
+       "Value #E": "WCL 10d",
+       "Value #F": "Stress",
+       "Value #G": "E[P&L]",
+       "Value #H": "ES",
+       "Value #I": "U roll",
+       "Value #J": "vs hold"
+      },
+      "indexByName": {
+       "candidate": 0,
+       "Value #B": 1,
+       "Value #C": 2,
+       "Value #D": 3,
+       "Value #E": 4,
+       "Value #F": 5,
+       "Value #G": 6,
+       "Value #H": 7,
+       "Value #I": 8,
+       "Value #J": 9,
+       "fails": 10
+      },
+      "excludeByName": {}
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "vs hold",
+        "desc": true
+       }
+      ]
+     }
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 0,
+     "custom": {
+      "align": "auto",
+      "minWidth": 60
+     },
+     "noValue": "\u2013"
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Candidate"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 250
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Can't recommend"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 130
        }
       ]
      }
