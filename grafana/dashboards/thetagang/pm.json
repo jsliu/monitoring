@@ -2274,7 +2274,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 90,
+    "y": 99,
     "w": 24,
     "h": 1
    },
@@ -2290,7 +2290,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 91,
+    "y": 100,
     "w": 6,
     "h": 9
    },
@@ -2340,7 +2340,7 @@
    "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
    "gridPos": {
     "x": 12,
-    "y": 91,
+    "y": 100,
     "w": 12,
     "h": 9
    },
@@ -2390,7 +2390,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 100,
+    "y": 109,
     "w": 24,
     "h": 1
    },
@@ -2407,7 +2407,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 101,
+    "y": 110,
     "w": 24,
     "h": 8
    },
@@ -2493,7 +2493,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 109,
+    "y": 118,
     "w": 24,
     "h": 1
    },
@@ -2510,7 +2510,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 110,
+    "y": 119,
     "w": 24,
     "h": 19
    },
@@ -2865,7 +2865,7 @@
    },
    "gridPos": {
     "x": 6,
-    "y": 91,
+    "y": 100,
     "w": 6,
     "h": 9
    },
@@ -4965,6 +4965,101 @@
       ]
      }
     ]
+   }
+  },
+  {
+   "id": 60,
+   "type": "row",
+   "title": "Forward test: what the model said, and what happened",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 90,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 61,
+   "type": "table",
+   "title": "Results by the model's view",
+   "description": "Each forecast against the same position 5 recorded days later, legs unchanged. Held, realised: the change in executable value, what holding made over closing that day. If the CLOSE view means anything, CLOSE rows should do worse than HOLD rows. Positions that closed or expired before the 5 days are not in here, and the days overlap, so far fewer independent results than rows. Empty until 5 trading days have passed.",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "journal"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 91,
+    "w": 16,
+    "h": 8
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "journal"
+     },
+     "refId": "A",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT model AS \"Model\", v AS \"View\", count(*) AS \"Results\", round(avg(predicted)::numeric, 0) AS \"Predicted ($)\", round(avg(realised)::numeric, 0) AS \"Held, realised ($)\", round(100.0 * avg((realised > 0)::int), 0) AS \"Beat closing (%)\", round(100.0 * avg(beyond_wcl::int), 0) AS \"Past the 5-day worst (%)\" FROM (SELECT 'IV fixed' AS model, view AS v, e_pnl AS predicted, realised_exec AS realised, beyond_wcl FROM forecast_results UNION ALL SELECT 'IV history', view_iv, e_pnl_iv, realised_exec, beyond_wcl FROM forecast_results) r WHERE v <> '-' GROUP BY 1, 2 ORDER BY 1, 2"
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "align": "auto"
+     },
+     "noValue": "\u2013"
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 62,
+   "type": "table",
+   "title": "Recorded so far",
+   "description": "The forward test, in the journal since 2026-11-06. One row per strategy per day, the day's last good quotes. Useful results take months, and cover only your positions and this market period.",
+   "datasource": {
+    "type": "grafana-postgresql-datasource",
+    "uid": "journal"
+   },
+   "gridPos": {
+    "x": 16,
+    "y": 91,
+    "w": 8,
+    "h": 8
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "grafana-postgresql-datasource",
+      "uid": "journal"
+     },
+     "refId": "A",
+     "format": "table",
+     "rawQuery": true,
+     "rawSql": "SELECT (SELECT count(DISTINCT day) FROM forecasts) AS \"Days recorded\", (SELECT count(*) FROM forecasts) AS \"Forecasts\", (SELECT count(*) FROM forecast_results) AS \"Results so far\", (SELECT count(*) FROM roll_forecasts) AS \"Roll candidates\", (SELECT count(*) FROM leg_marks) AS \"Leg marks\", (SELECT to_char(max(day), 'YYYY-MM-DD') FROM forecasts) AS \"Latest\" "
+    }
+   ],
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "custom": {
+      "align": "auto"
+     },
+     "noValue": "\u2013"
+    },
+    "overrides": []
    }
   }
  ]
