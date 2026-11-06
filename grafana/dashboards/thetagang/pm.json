@@ -2274,7 +2274,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 99,
+    "y": 108,
     "w": 24,
     "h": 1
    },
@@ -2291,7 +2291,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 100,
+    "y": 109,
     "w": 24,
     "h": 8
    },
@@ -2377,7 +2377,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 108,
+    "y": 117,
     "w": 24,
     "h": 1
    },
@@ -2394,7 +2394,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 109,
+    "y": 118,
     "w": 24,
     "h": 19
    },
@@ -3660,7 +3660,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 74,
+    "y": 83,
     "w": 24,
     "h": 1
    },
@@ -3677,7 +3677,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 79,
+    "y": 88,
     "w": 9,
     "h": 11
    },
@@ -3880,7 +3880,7 @@
    },
    "gridPos": {
     "x": 9,
-    "y": 79,
+    "y": 88,
     "w": 15,
     "h": 11
    },
@@ -4147,7 +4147,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 75,
+    "y": 84,
     "w": 4,
     "h": 4
    },
@@ -4210,7 +4210,7 @@
    },
    "gridPos": {
     "x": 4,
-    "y": 75,
+    "y": 84,
     "w": 4,
     "h": 4
    },
@@ -4243,7 +4243,7 @@
    },
    "fieldConfig": {
     "defaults": {
-     "unit": "none",
+     "unit": "suffix: pts",
      "decimals": 1,
      "noValue": "\u2013",
      "color": {
@@ -4273,7 +4273,7 @@
    },
    "gridPos": {
     "x": 8,
-    "y": 75,
+    "y": 84,
     "w": 4,
     "h": 4
    },
@@ -4336,7 +4336,7 @@
    },
    "gridPos": {
     "x": 12,
-    "y": 75,
+    "y": 84,
     "w": 4,
     "h": 4
    },
@@ -4399,7 +4399,7 @@
    },
    "gridPos": {
     "x": 16,
-    "y": 75,
+    "y": 84,
     "w": 4,
     "h": 4
    },
@@ -4462,7 +4462,7 @@
    },
    "gridPos": {
     "x": 20,
-    "y": 75,
+    "y": 84,
     "w": 4,
     "h": 4
    },
@@ -4803,13 +4803,269 @@
    }
   },
   {
+   "id": 63,
+   "type": "xychart",
+   "title": "Smile: IV by strike, per held expiry: $strategy",
+   "description": "The measured IV at a few strikes around the money, for each expiry this strategy holds (vault volatility_surface). X is the strike's distance from spot, in %. These are the points behind the sticky-delta figures: a small smile, not a fitted surface.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 74,
+    "w": 14,
+    "h": 9
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (expiry, move) (thetagang_pm_smile{strategy=\"$strategy\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "groupingToMatrix",
+     "options": {
+      "columnField": "expiry",
+      "rowField": "move",
+      "valueField": "Value",
+      "emptyValue": "null"
+     }
+    },
+    {
+     "id": "convertFieldType",
+     "options": {
+      "conversions": [
+       {
+        "targetField": "move\\expiry",
+        "destinationType": "number"
+       }
+      ]
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "move\\expiry"
+       }
+      ]
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "indexByName": {
+       "move\\expiry": 0
+      },
+      "renameByName": {
+       "move\\expiry": "Strike vs spot (%)"
+      }
+     }
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 1,
+     "custom": {
+      "show": "points+lines",
+      "lineWidth": 2,
+      "pointSize": {
+       "fixed": 6
+      },
+      "axisPlacement": "auto",
+      "axisLabel": "IV",
+      "spanNulls": true
+     },
+     "color": {
+      "mode": "palette-classic"
+     }
+    },
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Strike vs spot (%)"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "none"
+       },
+       {
+        "id": "decimals",
+        "value": 1
+       },
+       {
+        "id": "custom.axisLabel",
+        "value": "Strike vs spot (%)"
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "mapping": "auto",
+    "series": [
+     {
+      "x": {
+       "matcher": {
+        "id": "byName",
+        "options": "Strike vs spot (%)"
+       }
+      }
+     }
+    ],
+    "legend": {
+     "showLegend": true,
+     "displayMode": "list",
+     "placement": "bottom"
+    },
+    "tooltip": {
+     "mode": "multi",
+     "sort": "none"
+    }
+   },
+   "pluginVersion": "13.2.4"
+  },
+  {
+   "id": 64,
+   "type": "table",
+   "title": "Smile points",
+   "description": "Each measured strike: its expiry, distance from spot when measured, and IV. Wide or missing quotes are left out; an expiry with fewer than 3 good strikes has no smile.",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 14,
+    "y": 74,
+    "w": 10,
+    "h": 9
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum by (expiry, move) (thetagang_pm_smile{strategy=\"$strategy\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "convertFieldType",
+     "options": {
+      "conversions": [
+       {
+        "targetField": "move",
+        "destinationType": "number"
+       }
+      ],
+      "fields": {}
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "move"
+       }
+      ]
+     }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "expiry"
+       }
+      ]
+     }
+    },
+    {
+     "id": "organize",
+     "options": {
+      "excludeByName": {
+       "Time": true
+      },
+      "indexByName": {
+       "expiry": 0,
+       "move": 1,
+       "Value": 2
+      },
+      "renameByName": {
+       "expiry": "Expiry",
+       "move": "Strike vs spot (%)",
+       "Value": "IV"
+      }
+     }
+    }
+   ],
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": [
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "IV"
+      },
+      "properties": [
+       {
+        "id": "unit",
+        "value": "percentunit"
+       },
+       {
+        "id": "decimals",
+        "value": 1
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Strike vs spot (%)"
+      },
+      "properties": [
+       {
+        "id": "decimals",
+        "value": 1
+       }
+      ]
+     }
+    ]
+   },
+   "options": {
+    "showHeader": true,
+    "cellHeight": "sm"
+   }
+  },
+  {
    "id": 60,
    "type": "row",
    "title": "Forward test: what the model said, and what happened",
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 90,
+    "y": 99,
     "w": 24,
     "h": 1
    },
@@ -4826,7 +5082,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 91,
+    "y": 100,
     "w": 16,
     "h": 8
    },
@@ -4867,7 +5123,7 @@
    },
    "gridPos": {
     "x": 16,
-    "y": 91,
+    "y": 100,
     "w": 8,
     "h": 8
    },
