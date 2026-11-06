@@ -2268,129 +2268,13 @@
    }
   },
   {
-   "id": 24,
-   "type": "row",
-   "title": "Book",
-   "collapsed": false,
-   "gridPos": {
-    "x": 0,
-    "y": 99,
-    "w": 24,
-    "h": 1
-   },
-   "panels": []
-  },
-  {
-   "id": 25,
-   "type": "piechart",
-   "title": "Convexity class mix (net greeks)",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "gridPos": {
-    "x": 0,
-    "y": 100,
-    "w": 6,
-    "h": 9
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "count by (cls) (thetagang_pm_info)",
-     "legendFormat": "{{cls}}",
-     "instant": true,
-     "range": false,
-     "format": "time_series"
-    }
-   ],
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ],
-     "values": false
-    },
-    "pieType": "donut",
-    "legend": {
-     "displayMode": "table",
-     "placement": "right",
-     "values": [
-      "value"
-     ]
-    }
-   },
-   "fieldConfig": {
-    "defaults": {},
-    "overrides": []
-   }
-  },
-  {
-   "id": 26,
-   "type": "barchart",
-   "title": "Executable value by underlying (concentration)",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
-   "gridPos": {
-    "x": 12,
-    "y": 100,
-    "w": 12,
-    "h": 9
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "sort_desc(sum by (symbol) (abs(thetagang_pm{field=\"v_exec\"}) * on (strategy) group_left (symbol) thetagang_pm_info))",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    }
-   ],
-   "transformations": [
-    {
-     "id": "filterFieldsByName",
-     "options": {
-      "include": {
-       "pattern": "^(?!Time).*$"
-      }
-     }
-    }
-   ],
-   "options": {
-    "orientation": "horizontal",
-    "xField": "symbol",
-    "showValue": "auto",
-    "legend": {
-     "showLegend": false
-    }
-   },
-   "fieldConfig": {
-    "defaults": {
-     "unit": "currencyUSD"
-    },
-    "overrides": []
-   }
-  },
-  {
    "id": 27,
    "type": "row",
    "title": "Data quality",
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 109,
+    "y": 99,
     "w": 24,
     "h": 1
    },
@@ -2407,7 +2291,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 110,
+    "y": 100,
     "w": 24,
     "h": 8
    },
@@ -2493,7 +2377,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 118,
+    "y": 108,
     "w": 24,
     "h": 1
    },
@@ -2510,7 +2394,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 119,
+    "y": 109,
     "w": 24,
     "h": 19
    },
@@ -2852,55 +2736,6 @@
       ]
      }
     },
-    "overrides": []
-   }
-  },
-  {
-   "id": 34,
-   "type": "piechart",
-   "title": "Manager mix (how strategies were opened)",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "gridPos": {
-    "x": 6,
-    "y": 100,
-    "w": 6,
-    "h": 9
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "count by (manager) (thetagang_pm_info)",
-     "legendFormat": "{{manager}}",
-     "instant": true,
-     "range": false,
-     "format": "time_series"
-    }
-   ],
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ],
-     "values": false
-    },
-    "pieType": "donut",
-    "legend": {
-     "displayMode": "table",
-     "placement": "right",
-     "values": [
-      "value"
-     ]
-    }
-   },
-   "fieldConfig": {
-    "defaults": {},
     "overrides": []
    }
   },

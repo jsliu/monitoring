@@ -2732,6 +2732,171 @@
    }
   },
   {
+   "id": 54,
+   "type": "row",
+   "title": "Book",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 60,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 55,
+   "type": "piechart",
+   "title": "Convexity class mix (net greeks)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 61,
+    "w": 6,
+    "h": 9
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "count by (cls) (thetagang_pm_info)",
+     "legendFormat": "{{cls}}",
+     "instant": true,
+     "range": false,
+     "format": "time_series"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "values": false
+    },
+    "pieType": "donut",
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "values": [
+      "value"
+     ]
+    }
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   }
+  },
+  {
+   "id": 56,
+   "type": "piechart",
+   "title": "Manager mix (how strategies were opened)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 6,
+    "y": 61,
+    "w": 6,
+    "h": 9
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "count by (manager) (thetagang_pm_info)",
+     "legendFormat": "{{manager}}",
+     "instant": true,
+     "range": false,
+     "format": "time_series"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "values": false
+    },
+    "pieType": "donut",
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "values": [
+      "value"
+     ]
+    }
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   }
+  },
+  {
+   "id": 57,
+   "type": "barchart",
+   "title": "Executable value by underlying (concentration)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
+   "gridPos": {
+    "x": 12,
+    "y": 61,
+    "w": 12,
+    "h": 9
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sort_desc(sum by (symbol) (abs(thetagang_pm{field=\"v_exec\"}) * on (strategy) group_left (symbol) thetagang_pm_info))",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "transformations": [
+    {
+     "id": "filterFieldsByName",
+     "options": {
+      "include": {
+       "pattern": "^(?!Time).*$"
+      }
+     }
+    }
+   ],
+   "options": {
+    "orientation": "horizontal",
+    "xField": "symbol",
+    "showValue": "auto",
+    "legend": {
+     "showLegend": false
+    }
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD"
+    },
+    "overrides": []
+   }
+  },
+  {
    "id": 34,
    "type": "row",
    "title": "By symbol",
@@ -2739,7 +2904,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 60,
+    "y": 70,
     "w": 24,
     "h": 1
    },
@@ -2758,7 +2923,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 61,
+    "y": 71,
     "w": 14,
     "h": 11
    },
@@ -2887,7 +3052,7 @@
    },
    "gridPos": {
     "x": 14,
-    "y": 61,
+    "y": 71,
     "w": 10,
     "h": 11
    }
@@ -3454,7 +3619,7 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 72,
+    "y": 82,
     "w": 24,
     "h": 27
    }
@@ -3470,7 +3635,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 99,
+    "y": 109,
     "w": 24,
     "h": 27
    },
@@ -4755,7 +4920,7 @@
    ],
    "gridPos": {
     "x": 0,
-    "y": 126,
+    "y": 136,
     "w": 24,
     "h": 27
    }
@@ -4768,7 +4933,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 153,
+    "y": 163,
     "w": 24,
     "h": 1
    },
@@ -4787,7 +4952,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 154,
+    "y": 164,
     "w": 24,
     "h": 36
    },
@@ -5523,7 +5688,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 190,
+    "y": 200,
     "w": 24,
     "h": 1
    },
@@ -5542,7 +5707,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 191,
+    "y": 201,
     "w": 24,
     "h": 54
    },
@@ -6115,7 +6280,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 245,
+    "y": 255,
     "w": 24,
     "h": 1
    },
@@ -6134,7 +6299,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 246,
+    "y": 256,
     "w": 12,
     "h": 8
    },
@@ -6215,7 +6380,7 @@
    },
    "gridPos": {
     "x": 12,
-    "y": 246,
+    "y": 256,
     "w": 8,
     "h": 8
    },
@@ -6259,7 +6424,7 @@
    },
    "gridPos": {
     "x": 20,
-    "y": 246,
+    "y": 256,
     "w": 4,
     "h": 8
    },
@@ -6326,7 +6491,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 254,
+    "y": 264,
     "w": 24,
     "h": 12
    },
