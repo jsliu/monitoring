@@ -2274,7 +2274,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 79,
+    "y": 83,
     "w": 24,
     "h": 1
    },
@@ -2290,7 +2290,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 80,
+    "y": 84,
     "w": 6,
     "h": 9
    },
@@ -2340,7 +2340,7 @@
    "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
    "gridPos": {
     "x": 12,
-    "y": 80,
+    "y": 84,
     "w": 12,
     "h": 9
    },
@@ -2390,7 +2390,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 89,
+    "y": 93,
     "w": 24,
     "h": 1
    },
@@ -2407,7 +2407,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 90,
+    "y": 94,
     "w": 24,
     "h": 8
    },
@@ -2493,7 +2493,7 @@
    "collapsed": false,
    "gridPos": {
     "x": 0,
-    "y": 98,
+    "y": 102,
     "w": 24,
     "h": 1
    },
@@ -2510,7 +2510,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 99,
+    "y": 103,
     "w": 24,
     "h": 19
    },
@@ -2865,7 +2865,7 @@
    },
    "gridPos": {
     "x": 6,
-    "y": 80,
+    "y": 84,
     "w": 6,
     "h": 9
    },
@@ -3835,14 +3835,14 @@
    "id": 49,
    "type": "table",
    "title": "The model's view, every strategy",
-   "description": "The highest utility of HOLD, CLOSE and the best roll (vault roll_rules), from the forward value above: zero drift, IV unchanged (M8). Under those probabilities holding rarely beats cash after tail and capital costs, so expect mostly CLOSE until IV changes and a directional view enter the model. Reported, never a signal or an order. '\u2013': no probabilities or quotes.",
+   "description": "The highest utility of HOLD, CLOSE and the best roll (vault roll_rules), under two probability models. IV fixed: zero drift, IV unchanged (M8). IV history: the underlying's own joint 5-day price and IV moves from days with IV in the same third of its trailing year, price demeaned and scaled to the realised-vol forecast, expected IV change halved. Compare the two; neither is validated. Reported, never a signal or an order. '\u2013': no probabilities or quotes.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
    },
    "gridPos": {
     "x": 0,
-    "y": 68,
+    "y": 72,
     "w": 9,
     "h": 11
    },
@@ -3853,7 +3853,7 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "sum by (strategy, view, best, scanned) (thetagang_pm_view)",
+     "expr": "sum by (strategy, view, view_iv, best, scanned) (thetagang_pm_view)",
      "legendFormat": "",
      "instant": true,
      "range": false,
@@ -3874,15 +3874,17 @@
      "options": {
       "renameByName": {
        "strategy": "Strategy",
-       "view": "View",
+       "view": "IV fixed",
        "best": "Best roll",
-       "scanned": "Scanned"
+       "scanned": "Scanned",
+       "view_iv": "IV history"
       },
       "indexByName": {
        "strategy": 0,
        "view": 1,
-       "scanned": 2,
-       "best": 3
+       "view_iv": 2,
+       "scanned": 3,
+       "best": 4
       },
       "excludeByName": {}
      }
@@ -3909,7 +3911,7 @@
      {
       "matcher": {
        "id": "byName",
-       "options": "View"
+       "options": "IV fixed"
       },
       "properties": [
        {
@@ -3983,6 +3985,51 @@
         ]
        }
       ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "IV history"
+      },
+      "properties": [
+       {
+        "id": "custom.width",
+        "value": 70
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-text"
+        }
+       },
+       {
+        "id": "mappings",
+        "value": [
+         {
+          "type": "value",
+          "options": {
+           "ROLL": {
+            "color": "blue",
+            "index": 0
+           },
+           "CLOSE": {
+            "color": "orange",
+            "index": 1
+           },
+           "HOLD": {
+            "color": "green",
+            "index": 2
+           },
+           "-": {
+            "text": "\u2013",
+            "color": "text",
+            "index": 3
+           }
+          }
+         }
+        ]
+       }
+      ]
      }
     ]
    }
@@ -3991,14 +4038,14 @@
    "id": 48,
    "type": "table",
    "title": "Roll candidates ($): $strategy",
-   "description": "The same structure at later expiries and shifted strikes (vault roll_rules), each judged as a new trade at executable prices: cost to open, its own scenario risk, and its utility after closing the old strategy. U roll = its utility - the cost of closing today's; vs hold = U roll - U hold. A strategy not on HOLD is scanned about every 30 minutes (roll_rescan_mins). Reported, never an order; VIX options have no utility (no probabilities), so compare their risk and cost.",
+   "description": "The same structure at later expiries and shifted strikes (vault roll_rules), each judged as a new trade at executable prices: cost to open, its own scenario risk, and its utility after closing the old strategy. U roll = its utility - the cost of closing today's; vs hold = U roll - U hold. A strategy not on HOLD is scanned about every 30 minutes (roll_rescan_mins). Reported, never an order; VIX options have no utility (no probabilities), so compare their risk and cost. U roll IV and vs hold IV are the same comparison under the IV history model.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
    },
    "gridPos": {
     "x": 9,
-    "y": 68,
+    "y": 72,
     "w": 15,
     "h": 11
    },
@@ -4122,6 +4169,30 @@
      "instant": true,
      "range": false,
      "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "K",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"u_roll_iv\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "L",
+     "expr": "sum by (candidate) (thetagang_pm_roll{strategy=\"$strategy\",field=\"roll_score_iv\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
     }
    ],
    "transformations": [
@@ -4154,7 +4225,9 @@
        "Value #G": "E[P&L]",
        "Value #H": "ES",
        "Value #I": "U roll",
-       "Value #J": "vs hold"
+       "Value #J": "vs hold",
+       "Value #K": "U roll IV",
+       "Value #L": "vs hold IV"
       },
       "indexByName": {
        "candidate": 0,
@@ -4167,7 +4240,9 @@
        "Value #H": 7,
        "Value #I": 8,
        "Value #J": 9,
-       "fails": 10
+       "fails": 12,
+       "Value #K": 10,
+       "Value #L": 11
       },
       "excludeByName": {}
      }
@@ -4224,6 +4299,384 @@
       ]
      }
     ]
+   }
+  },
+  {
+   "id": 50,
+   "type": "stat",
+   "title": "IV rank",
+   "description": "Today's IV against its trailing year: 100% = the highest. IB's general IV for the underlying, not this strategy's contracts",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 68,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"iv_rank\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit",
+     "decimals": 0,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 51,
+   "type": "stat",
+   "title": "Expected IV change",
+   "description": "Mean 5-day IV change from days with IV in the same third of the trailing year, halved (iv_view_shrink). Points. A hypothesis on thin evidence",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 4,
+    "y": 68,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"iv_view\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 52,
+   "type": "stat",
+   "title": "E[P&L] IV history",
+   "description": "Expected 5-day P&L under the IV history model. Compare with E[P&L] above (IV unchanged)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 8,
+    "y": 68,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"e_pnl_iv\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 53,
+   "type": "stat",
+   "title": "ES IV history",
+   "description": "Expected Shortfall under the IV history model: average loss in the worst 10% of samples",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 12,
+    "y": 68,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"es_iv\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 54,
+   "type": "stat",
+   "title": "U hold \u2212 U close, IV history",
+   "description": "HOLD minus CLOSE under the IV history model. Reported only",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 16,
+    "y": 68,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "sum(thetagang_pm{strategy=\"$strategy\",field=\"u_hold_iv\"}) - sum(thetagang_pm{strategy=\"$strategy\",field=\"u_close\"})",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD",
+     "decimals": 1,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
+   }
+  },
+  {
+   "id": 55,
+   "type": "stat",
+   "title": "Samples",
+   "description": "Historical 5-day windows behind the IV history model",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 20,
+    "y": 68,
+    "w": 4,
+    "h": 4
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "A",
+     "expr": "thetagang_pm{strategy=\"$strategy\",field=\"iv_samples\"}",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "fields": "",
+     "values": false
+    },
+    "colorMode": "background",
+    "graphMode": "none",
+    "textMode": "auto",
+    "justifyMode": "center"
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "none",
+     "decimals": 0,
+     "noValue": "\u2013",
+     "color": {
+      "mode": "thresholds"
+     },
+     "thresholds": {
+      "mode": "absolute",
+      "steps": [
+       {
+        "color": "blue",
+        "value": null
+       }
+      ]
+     }
+    },
+    "overrides": []
    }
   }
  ]
