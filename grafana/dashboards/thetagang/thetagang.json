@@ -183,7 +183,7 @@
     "type": "prometheus",
     "uid": "prometheus"
    },
-   "description": "IB's daily P&L for the account, as TWS shows it: open positions plus positions closed today and commissions. The Daily P&L by symbol table covers open positions only, so its total can differ.",
+   "description": "IB's daily P&L for the account, as TWS shows it: open positions plus positions closed today and commissions. P&L today in the Symbols table covers open positions only, so its total can differ.",
    "targets": [
     {
      "datasource": {
@@ -2732,171 +2732,6 @@
    }
   },
   {
-   "id": 54,
-   "type": "row",
-   "title": "Book",
-   "collapsed": false,
-   "gridPos": {
-    "x": 0,
-    "y": 60,
-    "w": 24,
-    "h": 1
-   },
-   "panels": []
-  },
-  {
-   "id": 55,
-   "type": "piechart",
-   "title": "Convexity class mix (net greeks)",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "gridPos": {
-    "x": 0,
-    "y": 61,
-    "w": 6,
-    "h": 9
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "count by (cls) (thetagang_pm_info)",
-     "legendFormat": "{{cls}}",
-     "instant": true,
-     "range": false,
-     "format": "time_series"
-    }
-   ],
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ],
-     "values": false
-    },
-    "pieType": "donut",
-    "legend": {
-     "displayMode": "table",
-     "placement": "right",
-     "values": [
-      "value"
-     ]
-    }
-   },
-   "fieldConfig": {
-    "defaults": {},
-    "overrides": []
-   }
-  },
-  {
-   "id": 56,
-   "type": "piechart",
-   "title": "Manager mix (how strategies were opened)",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "gridPos": {
-    "x": 6,
-    "y": 61,
-    "w": 6,
-    "h": 9
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "count by (manager) (thetagang_pm_info)",
-     "legendFormat": "{{manager}}",
-     "instant": true,
-     "range": false,
-     "format": "time_series"
-    }
-   ],
-   "options": {
-    "reduceOptions": {
-     "calcs": [
-      "lastNotNull"
-     ],
-     "values": false
-    },
-    "pieType": "donut",
-    "legend": {
-     "displayMode": "table",
-     "placement": "right",
-     "values": [
-      "value"
-     ]
-    }
-   },
-   "fieldConfig": {
-    "defaults": {},
-    "overrides": []
-   }
-  },
-  {
-   "id": 57,
-   "type": "barchart",
-   "title": "Executable value by underlying (concentration)",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
-   "gridPos": {
-    "x": 12,
-    "y": 61,
-    "w": 12,
-    "h": 9
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "sort_desc(sum by (symbol) (abs(thetagang_pm{field=\"v_exec\"}) * on (strategy) group_left (symbol) thetagang_pm_info))",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    }
-   ],
-   "transformations": [
-    {
-     "id": "filterFieldsByName",
-     "options": {
-      "include": {
-       "pattern": "^(?!Time).*$"
-      }
-     }
-    }
-   ],
-   "options": {
-    "orientation": "horizontal",
-    "xField": "symbol",
-    "showValue": "auto",
-    "legend": {
-     "showLegend": false
-    }
-   },
-   "fieldConfig": {
-    "defaults": {
-     "unit": "currencyUSD"
-    },
-    "overrides": []
-   }
-  },
-  {
    "id": 34,
    "type": "row",
    "title": "By symbol",
@@ -2904,7 +2739,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 70,
+    "y": 60,
     "w": 24,
     "h": 1
    },
@@ -2923,7 +2758,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 71,
+    "y": 61,
     "w": 14,
     "h": 11
    },
@@ -3052,7 +2887,7 @@
    },
    "gridPos": {
     "x": 14,
-    "y": 71,
+    "y": 61,
     "w": 10,
     "h": 11
    }
@@ -3060,8 +2895,8 @@
   {
    "id": 23,
    "type": "table",
-   "title": "Daily P&L by symbol (attribution)",
-   "description": "IB's daily P&L per symbol, for open positions only (the P&L today tile is the whole account: it adds positions closed today and commissions). From SPX: beta delta $ x SPX move. Unexplained: P&L - From SPX. Delta: delta $ x the symbol's own move. Gamma: 1/2 gamma (dS)^2. Theta: one day of decay. Vega: vega x IV change since the day's first observation. Residual: the rest (today's trades, vanna/volga, dividends). P&L = Delta + Gamma + Theta + Vega + Residual.",
+   "title": "Symbols: today's P&L (blue) and risk (purple)",
+   "description": "Blue, today's P&L: IB's daily P&L per symbol, for open positions only (the P&L today tile is the whole account: it adds positions closed today and commissions). From SPX: beta delta $ x SPX move. Unexplained: P&L - From SPX. \u0394 P&L: delta $ x the symbol's own move. \u0393 P&L: 1/2 gamma (dS)^2. \u0398 P&L: one day of decay. V P&L: vega x IV change since the day's first observation. Residual: the rest (today's trades, vanna/volga, dividends). P&L = \u0394 + \u0393 + \u0398 + V + Residual.\n\nPurple, risk now: net greeks of all stock and option positions per symbol. Hedge P&L and net carry: delta hedging each symbol on a typical day of its own (last month's realized daily move).\n\nIn both, the lighter shade is zero or more and the darker shade is negative.",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
@@ -3162,12 +2997,130 @@
      "instant": true,
      "range": false,
      "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "I",
+     "expr": "sum by (symbol) (thetagang_symbol_beta)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "J",
+     "expr": "sum by (symbol) (thetagang_symbol_delta_shares)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "K",
+     "expr": "sum by (symbol) (thetagang_symbol_delta_dollars)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "L",
+     "expr": "sum by (symbol) (thetagang_symbol_beta_delta_dollars)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "M",
+     "expr": "sum by (symbol) (thetagang_symbol_gamma)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "N",
+     "expr": "sum by (symbol) (thetagang_symbol_theta)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "O",
+     "expr": "sum by (symbol) (thetagang_symbol_vega)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "P",
+     "expr": "sum by (symbol) (thetagang_symbol_volga)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "Q",
+     "expr": "sum by (symbol) (thetagang_symbol_gamma_pnl)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "refId": "R",
+     "expr": "sum by (symbol) (thetagang_symbol_net_carry)",
+     "legendFormat": "",
+     "instant": true,
+     "range": false,
+     "format": "table"
     }
    ],
    "fieldConfig": {
     "defaults": {
-     "unit": "currencyUSD",
-     "decimals": 0,
      "custom": {
       "minWidth": 50
      }
@@ -3193,11 +3146,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#1b3a5c",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#2a5788",
            "value": 0
           }
          ]
@@ -3212,12 +3165,13 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
+        "value": 85
        }
       ]
      },
@@ -3241,11 +3195,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#1b3a5c",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#2a5788",
            "value": 0
           }
          ]
@@ -3260,12 +3214,13 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
+        "value": 80
        }
       ]
      },
@@ -3289,11 +3244,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#1b3a5c",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#2a5788",
            "value": 0
           }
          ]
@@ -3308,19 +3263,20 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
+        "value": 95
        }
       ]
      },
      {
       "matcher": {
        "id": "byName",
-       "options": "\u0394 Delta"
+       "options": "\u0394 P&L"
       },
       "properties": [
        {
@@ -3337,11 +3293,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#1b3a5c",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#2a5788",
            "value": 0
           }
          ]
@@ -3356,19 +3312,20 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
+        "value": 65
        }
       ]
      },
      {
       "matcher": {
        "id": "byName",
-       "options": "\u0393 Gamma"
+       "options": "\u0393 P&L"
       },
       "properties": [
        {
@@ -3385,11 +3342,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#1b3a5c",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#2a5788",
            "value": 0
           }
          ]
@@ -3404,19 +3361,20 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
+        "value": 65
        }
       ]
      },
      {
       "matcher": {
        "id": "byName",
-       "options": "\u0398 Theta"
+       "options": "\u0398 P&L"
       },
       "properties": [
        {
@@ -3433,11 +3391,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#1b3a5c",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#2a5788",
            "value": 0
           }
          ]
@@ -3452,19 +3410,20 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
+        "value": 65
        }
       ]
      },
      {
       "matcher": {
        "id": "byName",
-       "options": "V Vega"
+       "options": "V P&L"
       },
       "properties": [
        {
@@ -3481,11 +3440,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#1b3a5c",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#2a5788",
            "value": 0
           }
          ]
@@ -3500,12 +3459,13 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
+        "value": 65
        }
       ]
      },
@@ -3529,11 +3489,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#1b3a5c",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#2a5788",
            "value": 0
           }
          ]
@@ -3548,247 +3508,13 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Symbol"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 80
-       }
-      ]
-     }
-    ]
-   },
-   "options": {
-    "cellHeight": "sm",
-    "footer": {
-     "show": true,
-     "reducer": [
-      "sum"
-     ],
-     "fields": "",
-     "countRows": false
-    }
-   },
-   "transformations": [
-    {
-     "id": "merge"
-    },
-    {
-     "id": "organize",
-     "options": {
-      "excludeByName": {
-       "Time": true
-      },
-      "renameByName": {
-       "Value #A": "P&L today",
-       "Value #B": "From SPX",
-       "Value #C": "Unexplained",
-       "Value #D": "\u0394 Delta",
-       "Value #E": "\u0393 Gamma",
-       "Value #F": "\u0398 Theta",
-       "Value #G": "V Vega",
-       "Value #H": "Residual",
-       "symbol": "Symbol"
-      }
-     }
-    },
-    {
-     "id": "sortBy",
-     "options": {
-      "sort": [
-       {
-        "field": "Unexplained",
-        "desc": true
-       }
-      ]
-     }
-    }
-   ],
-   "gridPos": {
-    "x": 0,
-    "y": 82,
-    "w": 24,
-    "h": 27
-   }
-  },
-  {
-   "id": 13,
-   "type": "table",
-   "title": "Symbols",
-   "description": "Net greeks of all stock and option positions per symbol. Hedge gamma P&L and net carry: delta hedging each symbol on a typical day of its own (last month's realized daily move).",
-   "datasource": {
-    "type": "prometheus",
-    "uid": "prometheus"
-   },
-   "gridPos": {
-    "x": 0,
-    "y": 109,
-    "w": 24,
-    "h": 27
-   },
-   "targets": [
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "A",
-     "expr": "sum by (symbol) (thetagang_symbol_beta)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "B",
-     "expr": "sum by (symbol) (thetagang_symbol_delta_shares)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "C",
-     "expr": "sum by (symbol) (thetagang_symbol_delta_dollars)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "D",
-     "expr": "sum by (symbol) (thetagang_symbol_beta_delta_dollars)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "E",
-     "expr": "sum by (symbol) (thetagang_symbol_theta)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "F",
-     "expr": "sum by (symbol) (thetagang_symbol_vega)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "G",
-     "expr": "sum by (symbol) (thetagang_symbol_gamma)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "H",
-     "expr": "sum by (symbol) (thetagang_symbol_volga)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "I",
-     "expr": "sum by (symbol) (thetagang_symbol_pnl{part=\"pnl\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "J",
-     "expr": "sum by (symbol) (thetagang_symbol_gamma_pnl)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "K",
-     "expr": "sum by (symbol) (thetagang_symbol_net_carry)",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    }
-   ],
-   "fieldConfig": {
-    "defaults": {},
-    "overrides": [
-     {
-      "matcher": {
-       "id": "byRegexp",
-       "options": "Delta \\$|Beta delta \\$|Theta.*|Vega.*"
-      },
-      "properties": [
-       {
-        "id": "unit",
-        "value": "currencyUSD"
-       },
-       {
-        "id": "decimals",
-        "value": 0
+        "value": 75
        }
       ]
      },
@@ -3803,8 +3529,78 @@
         "value": 2
        },
        {
+        "id": "thresholds",
+        "value": {
+         "mode": "absolute",
+         "steps": [
+          {
+           "color": "#402c60",
+           "value": null
+          },
+          {
+           "color": "#5c3f86",
+           "value": 0
+          }
+         ]
+        }
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "thresholds"
+        }
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-background",
+         "mode": "basic"
+        }
+       },
+       {
         "id": "custom.width",
-        "value": 60
+        "value": 55
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Delta (shares)"
+      },
+      "properties": [
+       {
+        "id": "thresholds",
+        "value": {
+         "mode": "absolute",
+         "steps": [
+          {
+           "color": "#402c60",
+           "value": null
+          },
+          {
+           "color": "#5c3f86",
+           "value": 0
+          }
+         ]
+        }
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "thresholds"
+        }
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-background",
+         "mode": "basic"
+        }
+       },
+       {
+        "id": "custom.width",
+        "value": 105
        }
       ]
      },
@@ -3828,11 +3624,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#402c60",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#5c3f86",
            "value": 0
           }
          ]
@@ -3847,7 +3643,8 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
@@ -3876,11 +3673,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#402c60",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#5c3f86",
            "value": 0
           }
          ]
@@ -3895,12 +3692,58 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
+        "value": 95
+       }
+      ]
+     },
+     {
+      "matcher": {
+       "id": "byName",
+       "options": "Gamma sh/$1"
+      },
+      "properties": [
+       {
+        "id": "thresholds",
+        "value": {
+         "mode": "absolute",
+         "steps": [
+          {
+           "color": "#402c60",
+           "value": null
+          },
+          {
+           "color": "#5c3f86",
+           "value": 0
+          }
+         ]
+        }
+       },
+       {
+        "id": "color",
+        "value": {
+         "mode": "thresholds"
+        }
+       },
+       {
+        "id": "custom.cellOptions",
+        "value": {
+         "type": "color-background",
+         "mode": "basic"
+        }
+       },
+       {
+        "id": "custom.width",
+        "value": 100
+       },
+       {
+        "id": "description",
+        "value": "Gamma: the change in share delta per $1 move of the stock."
        }
       ]
      },
@@ -3924,11 +3767,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#402c60",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#5c3f86",
            "value": 0
           }
          ]
@@ -3943,12 +3786,13 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 110
+        "value": 90
        }
       ]
      },
@@ -3972,11 +3816,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#402c60",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#5c3f86",
            "value": 0
           }
          ]
@@ -3991,12 +3835,13 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 95
+        "value": 80
        }
       ]
      },
@@ -4020,11 +3865,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#402c60",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#5c3f86",
            "value": 0
           }
          ]
@@ -4039,96 +3884,13 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
        },
        {
         "id": "custom.width",
-        "value": 100
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Delta (shares)"
-      },
-      "properties": [
-       {
-        "id": "thresholds",
-        "value": {
-         "mode": "absolute",
-         "steps": [
-          {
-           "color": "red",
-           "value": null
-          },
-          {
-           "color": "green",
-           "value": 0
-          }
-         ]
-        }
-       },
-       {
-        "id": "color",
-        "value": {
-         "mode": "thresholds"
-        }
-       },
-       {
-        "id": "custom.cellOptions",
-        "value": {
-         "type": "color-text"
-        }
-       },
-       {
-        "id": "custom.width",
-        "value": 125
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Gamma sh/$1"
-      },
-      "properties": [
-       {
-        "id": "thresholds",
-        "value": {
-         "mode": "absolute",
-         "steps": [
-          {
-           "color": "red",
-           "value": null
-          },
-          {
-           "color": "green",
-           "value": 0
-          }
-         ]
-        }
-       },
-       {
-        "id": "color",
-        "value": {
-         "mode": "thresholds"
-        }
-       },
-       {
-        "id": "custom.cellOptions",
-        "value": {
-         "type": "color-text"
-        }
-       },
-       {
-        "id": "description",
-        "value": "Gamma: the change in share delta per $1 move of the stock."
-       },
-       {
-        "id": "custom.width",
-        "value": 120
+        "value": 85
        }
       ]
      },
@@ -4152,11 +3914,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#402c60",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#5c3f86",
            "value": 0
           }
          ]
@@ -4171,16 +3933,17 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
+       },
+       {
+        "id": "custom.width",
+        "value": 125
        },
        {
         "id": "description",
         "value": "What delta hedging this symbol earns (long gamma, +) or costs (short gamma, -) on a typical day: 1/2 x gamma x (daily move x price)^2."
-       },
-       {
-        "id": "custom.width",
-        "value": 145
        }
       ]
      },
@@ -4204,11 +3967,11 @@
          "mode": "absolute",
          "steps": [
           {
-           "color": "red",
+           "color": "#402c60",
            "value": null
           },
           {
-           "color": "green",
+           "color": "#5c3f86",
            "value": 0
           }
          ]
@@ -4223,60 +3986,9 @@
        {
         "id": "custom.cellOptions",
         "value": {
-         "type": "color-text"
+         "type": "color-background",
+         "mode": "basic"
         }
-       },
-       {
-        "id": "description",
-        "value": "Theta + hedge gamma P&L: what holding the position delta-hedged makes on a typical day."
-       },
-       {
-        "id": "custom.width",
-        "value": 135
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Daily P&L ($)"
-      },
-      "properties": [
-       {
-        "id": "thresholds",
-        "value": {
-         "mode": "absolute",
-         "steps": [
-          {
-           "color": "red",
-           "value": null
-          },
-          {
-           "color": "green",
-           "value": 0
-          }
-         ]
-        }
-       },
-       {
-        "id": "color",
-        "value": {
-         "mode": "thresholds"
-        }
-       },
-       {
-        "id": "custom.cellOptions",
-        "value": {
-         "type": "color-text"
-        }
-       },
-       {
-        "id": "unit",
-        "value": "locale"
-       },
-       {
-        "id": "decimals",
-        "value": 0
        },
        {
         "id": "custom.width",
@@ -4284,7 +3996,7 @@
        },
        {
         "id": "description",
-        "value": "Today's P&L of all positions in this symbol, from IB (as in the Daily P&L by symbol table)."
+        "value": "Theta + hedge gamma P&L: what holding the position delta-hedged makes on a typical day."
        }
       ]
      },
@@ -4296,7 +4008,7 @@
       "properties": [
        {
         "id": "custom.width",
-        "value": 80
+        "value": 70
        }
       ]
      }
@@ -4310,7 +4022,14 @@
       "sum"
      ],
      "fields": [
-      "Daily P&L ($)",
+      "P&L today",
+      "From SPX",
+      "Unexplained",
+      "\u0394 P&L",
+      "\u0393 P&L",
+      "\u0398 P&L",
+      "V P&L",
+      "Residual",
       "Delta $",
       "Beta delta $",
       "Theta $/day",
@@ -4333,45 +4052,94 @@
        "Time": true
       },
       "renameByName": {
-       "Value #A": "Beta",
-       "Value #B": "Delta (shares)",
-       "Value #C": "Delta $",
-       "Value #D": "Beta delta $",
-       "Value #E": "Theta $/day",
-       "Value #F": "Vega $/pt",
-       "Value #G": "Gamma sh/$1",
-       "Value #H": "Volga $/pt",
-       "Value #I": "Daily P&L ($)",
-       "Value #J": "Hedge P&L $/day",
-       "Value #K": "Net carry $/day",
-       "symbol": "Symbol"
+       "symbol": "Symbol",
+       "Value #A": "P&L today",
+       "Value #B": "From SPX",
+       "Value #C": "Unexplained",
+       "Value #D": "\u0394 P&L",
+       "Value #E": "\u0393 P&L",
+       "Value #F": "\u0398 P&L",
+       "Value #G": "V P&L",
+       "Value #H": "Residual",
+       "Value #I": "Beta",
+       "Value #J": "Delta (shares)",
+       "Value #K": "Delta $",
+       "Value #L": "Beta delta $",
+       "Value #M": "Gamma sh/$1",
+       "Value #N": "Theta $/day",
+       "Value #O": "Vega $/pt",
+       "Value #P": "Volga $/pt",
+       "Value #Q": "Hedge P&L $/day",
+       "Value #R": "Net carry $/day"
       },
       "indexByName": {
        "symbol": 0,
-       "Value #I": 1,
-       "Value #A": 2,
-       "Value #B": 3,
-       "Value #C": 4,
-       "Value #D": 5,
-       "Value #E": 6,
-       "Value #F": 7,
-       "Value #G": 8,
-       "Value #H": 9,
+       "Value #A": 1,
+       "Value #B": 2,
+       "Value #C": 3,
+       "Value #D": 4,
+       "Value #E": 5,
+       "Value #F": 6,
+       "Value #G": 7,
+       "Value #H": 8,
+       "Value #I": 9,
        "Value #J": 10,
-       "Value #K": 11
+       "Value #K": 11,
+       "Value #L": 12,
+       "Value #M": 13,
+       "Value #N": 14,
+       "Value #O": 15,
+       "Value #P": 16,
+       "Value #Q": 17,
+       "Value #R": 18
       }
      }
+    },
+    {
+     "id": "sortBy",
+     "options": {
+      "sort": [
+       {
+        "field": "Unexplained",
+        "desc": true
+       }
+      ]
+     }
     }
-   ]
+   ],
+   "gridPos": {
+    "x": 0,
+    "y": 72,
+    "w": 24,
+    "h": 29
+   }
   },
   {
-   "id": 24,
-   "type": "table",
-   "title": "Positions summary and SPX \u0394=0 targets",
-   "description": "Per symbol: what you hold, and the target that makes SPX delta 0. 'Net target contracts' is the trade toward it: placed by the strategy only with place_target_orders = true (then it's in the Trade plan), otherwise for reference.",
+   "id": 54,
+   "type": "row",
+   "title": "Book",
+   "collapsed": false,
+   "gridPos": {
+    "x": 0,
+    "y": 101,
+    "w": 24,
+    "h": 1
+   },
+   "panels": []
+  },
+  {
+   "id": 55,
+   "type": "piechart",
+   "title": "Convexity class mix (net greeks)",
    "datasource": {
     "type": "prometheus",
     "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 0,
+    "y": 102,
+    "w": 6,
+    "h": 14
    },
    "targets": [
     {
@@ -4380,549 +4148,135 @@
       "uid": "prometheus"
      },
      "refId": "A",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"shares\"})",
-     "legendFormat": "",
+     "expr": "count by (cls) (thetagang_pm_info)",
+     "legendFormat": "{{cls}}",
      "instant": true,
      "range": false,
-     "format": "table"
+     "format": "time_series"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "values": false
     },
+    "pieType": "donut",
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "values": [
+      "value"
+     ]
+    }
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   }
+  },
+  {
+   "id": 56,
+   "type": "piechart",
+   "title": "Manager mix (how strategies were opened)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "x": 6,
+    "y": 102,
+    "w": 6,
+    "h": 14
+   },
+   "targets": [
     {
      "datasource": {
       "type": "prometheus",
       "uid": "prometheus"
      },
-     "refId": "B",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"short_puts\"})",
-     "legendFormat": "",
+     "refId": "A",
+     "expr": "count by (manager) (thetagang_pm_info)",
+     "legendFormat": "{{manager}}",
      "instant": true,
      "range": false,
-     "format": "table"
+     "format": "time_series"
+    }
+   ],
+   "options": {
+    "reduceOptions": {
+     "calcs": [
+      "lastNotNull"
+     ],
+     "values": false
     },
+    "pieType": "donut",
+    "legend": {
+     "displayMode": "table",
+     "placement": "right",
+     "values": [
+      "value"
+     ]
+    }
+   },
+   "fieldConfig": {
+    "defaults": {},
+    "overrides": []
+   }
+  },
+  {
+   "id": 57,
+   "type": "barchart",
+   "title": "Executable value by underlying (concentration)",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "description": "Sum of |executable value| of each underlying's strategies (vault: portfolio_management).",
+   "gridPos": {
+    "x": 12,
+    "y": 102,
+    "w": 12,
+    "h": 14
+   },
+   "targets": [
     {
      "datasource": {
       "type": "prometheus",
       "uid": "prometheus"
      },
-     "refId": "C",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"long_puts\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "D",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"short_calls\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "E",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"long_calls\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "F",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"avg_short_put_strike\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "G",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"avg_long_put_strike\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "H",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"avg_short_call_strike\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "I",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"avg_long_call_strike\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "J",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"weight_now\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "K",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"target_weight\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "L",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"target_beta_delta_dollars\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "M",
-     "expr": "sum by (symbol) (thetagang_symbol_summary{field=\"share_equiv_change\"})",
-     "legendFormat": "",
-     "instant": true,
-     "range": false,
-     "format": "table"
-    },
-    {
-     "datasource": {
-      "type": "prometheus",
-      "uid": "prometheus"
-     },
-     "refId": "N",
-     "expr": "sum by (symbol, side_now, side_target, trade) (thetagang_symbol_target)",
+     "refId": "A",
+     "expr": "sort_desc(sum by (symbol) (abs(thetagang_pm{field=\"v_exec\"}) * on (strategy) group_left (symbol) thetagang_pm_info))",
      "legendFormat": "",
      "instant": true,
      "range": false,
      "format": "table"
     }
    ],
-   "fieldConfig": {
-    "defaults": {
-     "decimals": 0
-    },
-    "overrides": [
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Avg short put K"
-      },
-      "properties": [
-       {
-        "id": "displayName",
-        "value": "Avg short put K"
-       },
-       {
-        "id": "unit",
-        "value": "currencyUSD"
-       },
-       {
-        "id": "custom.width",
-        "value": 135
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Avg long put K"
-      },
-      "properties": [
-       {
-        "id": "displayName",
-        "value": "Avg long put K"
-       },
-       {
-        "id": "unit",
-        "value": "currencyUSD"
-       },
-       {
-        "id": "custom.width",
-        "value": 130
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Avg short call K"
-      },
-      "properties": [
-       {
-        "id": "displayName",
-        "value": "Avg short call K"
-       },
-       {
-        "id": "unit",
-        "value": "currencyUSD"
-       },
-       {
-        "id": "custom.width",
-        "value": 135
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Avg long call K"
-      },
-      "properties": [
-       {
-        "id": "displayName",
-        "value": "Avg long call K"
-       },
-       {
-        "id": "unit",
-        "value": "currencyUSD"
-       },
-       {
-        "id": "custom.width",
-        "value": 130
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Weight now"
-      },
-      "properties": [
-       {
-        "id": "displayName",
-        "value": "Weight now"
-       },
-       {
-        "id": "unit",
-        "value": "percentunit"
-       },
-       {
-        "id": "decimals",
-        "value": 1
-       },
-       {
-        "id": "custom.width",
-        "value": 110
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Target weight (SPX \u0394=0)"
-      },
-      "properties": [
-       {
-        "id": "displayName",
-        "value": "Target weight (SPX \u0394=0)"
-       },
-       {
-        "id": "unit",
-        "value": "percentunit"
-       },
-       {
-        "id": "decimals",
-        "value": 1
-       },
-       {
-        "id": "custom.width",
-        "value": 195
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Target beta delta $"
-      },
-      "properties": [
-       {
-        "id": "unit",
-        "value": "currencyUSD"
-       },
-       {
-        "id": "decimals",
-        "value": 0
-       },
-       {
-        "id": "thresholds",
-        "value": {
-         "mode": "absolute",
-         "steps": [
-          {
-           "color": "red",
-           "value": null
-          },
-          {
-           "color": "green",
-           "value": 0
-          }
-         ]
-        }
-       },
-       {
-        "id": "color",
-        "value": {
-         "mode": "thresholds"
-        }
-       },
-       {
-        "id": "custom.cellOptions",
-        "value": {
-         "type": "color-text"
-        }
-       },
-       {
-        "id": "custom.width",
-        "value": 155
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Share-equiv change"
-      },
-      "properties": [
-       {
-        "id": "thresholds",
-        "value": {
-         "mode": "absolute",
-         "steps": [
-          {
-           "color": "red",
-           "value": null
-          },
-          {
-           "color": "green",
-           "value": 0
-          }
-         ]
-        }
-       },
-       {
-        "id": "color",
-        "value": {
-         "mode": "thresholds"
-        }
-       },
-       {
-        "id": "custom.cellOptions",
-        "value": {
-         "type": "color-text"
-        }
-       },
-       {
-        "id": "custom.width",
-        "value": 165
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Symbol"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 80
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Shares"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 75
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Short puts"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 100
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Long puts"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 95
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Short calls"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 100
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Long calls"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 95
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Side now"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 90
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Side target"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 100
-       }
-      ]
-     },
-     {
-      "matcher": {
-       "id": "byName",
-       "options": "Net target contracts"
-      },
-      "properties": [
-       {
-        "id": "custom.width",
-        "value": 295
-       }
-      ]
-     }
-    ]
-   },
-   "options": {
-    "cellHeight": "sm"
-   },
    "transformations": [
-    {
-     "id": "joinByField",
-     "options": {
-      "byField": "symbol",
-      "mode": "outer"
-     }
-    },
     {
      "id": "filterFieldsByName",
      "options": {
       "include": {
-       "pattern": "^(?!(Time.*|Value #N)$).*$"
-      }
-     }
-    },
-    {
-     "id": "organize",
-     "options": {
-      "renameByName": {
-       "Value #A": "Shares",
-       "Value #B": "Short puts",
-       "Value #C": "Long puts",
-       "Value #D": "Short calls",
-       "Value #E": "Long calls",
-       "Value #F": "Avg short put K",
-       "Value #G": "Avg long put K",
-       "Value #H": "Avg short call K",
-       "Value #I": "Avg long call K",
-       "Value #J": "Weight now",
-       "Value #K": "Target weight (SPX \u0394=0)",
-       "Value #L": "Target beta delta $",
-       "Value #M": "Share-equiv change",
-       "symbol": "Symbol",
-       "side_now": "Side now",
-       "side_target": "Side target",
-       "trade": "Net target contracts"
+       "pattern": "^(?!Time).*$"
       }
      }
     }
    ],
-   "gridPos": {
-    "x": 0,
-    "y": 136,
-    "w": 24,
-    "h": 27
+   "options": {
+    "orientation": "horizontal",
+    "xField": "symbol",
+    "showValue": "auto",
+    "legend": {
+     "showLegend": false
+    }
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "currencyUSD"
+    },
+    "overrides": []
    }
   },
   {
@@ -4933,7 +4287,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 163,
+    "y": 116,
     "w": 24,
     "h": 1
    },
@@ -4952,7 +4306,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 164,
+    "y": 117,
     "w": 24,
     "h": 36
    },
@@ -5688,7 +5042,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 200,
+    "y": 153,
     "w": 24,
     "h": 1
    },
@@ -5707,7 +5061,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 201,
+    "y": 154,
     "w": 24,
     "h": 54
    },
@@ -6280,7 +5634,7 @@
    "panels": [],
    "gridPos": {
     "x": 0,
-    "y": 255,
+    "y": 208,
     "w": 24,
     "h": 1
    },
@@ -6299,7 +5653,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 256,
+    "y": 209,
     "w": 12,
     "h": 8
    },
@@ -6380,7 +5734,7 @@
    },
    "gridPos": {
     "x": 12,
-    "y": 256,
+    "y": 209,
     "w": 8,
     "h": 8
    },
@@ -6424,7 +5778,7 @@
    },
    "gridPos": {
     "x": 20,
-    "y": 256,
+    "y": 209,
     "w": 4,
     "h": 8
    },
@@ -6491,7 +5845,7 @@
    },
    "gridPos": {
     "x": 0,
-    "y": 264,
+    "y": 217,
     "w": 24,
     "h": 12
    },
