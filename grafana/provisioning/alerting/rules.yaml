@@ -408,6 +408,55 @@
           ]
         },
         {
+          "uid": "tg-ib-session-unhealthy",
+          "title": "thetagang IB session unhealthy",
+          "condition": "C",
+          "for": "5m",
+          "noDataState": "OK",
+          "execErrState": "Error",
+          "labels": {
+            "window": "thetagang",
+            "account": "live"
+          },
+          "annotations": {
+            "summary": "A recently active thetagang role has no healthy IB session (missing, disconnected, or wrong account/role): run ./run.sh health and inspect the service logs."
+          },
+          "data": [
+            {
+              "refId": "A",
+              "relativeTimeRange": {
+                "from": 600,
+                "to": 0
+              },
+              "datasourceUid": "prometheus",
+              "model": {
+                "refId": "A",
+                "expr": "(max_over_time(up{job=\"thetagang\"}[8h]) > 0 unless on(job, instance) (thetagang_ib_session_healthy{role=\"monitor\"} == 1)) or (max_over_time(up{job=\"thetagang-strategy\"}[8h]) > 0 unless on(job, instance) (thetagang_ib_session_healthy{role=\"trade\"} == 1))",
+                "instant": true
+              }
+            },
+            {
+              "refId": "C",
+              "datasourceUid": "__expr__",
+              "model": {
+                "refId": "C",
+                "type": "threshold",
+                "expression": "A",
+                "conditions": [
+                  {
+                    "evaluator": {
+                      "type": "gt",
+                      "params": [
+                        0.5
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "uid": "tg-stale",
           "title": "thetagang-nt data stale",
           "condition": "C",

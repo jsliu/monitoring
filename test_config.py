@@ -45,7 +45,7 @@ def test_every_alert_window_has_its_route_and_a_new_york_time_interval():
     routes = {r["object_matchers"][0][2]: r for r in notifications["policies"][0]["routes"]}
     rules = _rules()
 
-    assert len(rules) == 14  # 6 intraday + 8 thetagang
+    assert len(rules) == 15  # 6 intraday + 9 thetagang
     for rule in rules:
         window = rule["labels"]["window"]
         assert routes[window]["active_time_intervals"] == [window]
@@ -56,7 +56,7 @@ def test_thetagang_alerts_query_only_thetagang_metrics():
     groups = _json(ALERTING / "rules.yaml")["groups"]
     rules = [r for g in groups if g["name"] == "thetagang" for r in g["rules"]]
     exprs = [d["model"]["expr"] for r in rules for d in r["data"] if "expr" in d["model"]]
-    assert len(rules) == 8 and all(r["labels"]["window"] == "thetagang" for r in rules)
+    assert len(rules) == 9 and all(r["labels"]["window"] == "thetagang" for r in rules)
     assert all(re.findall(r"\bthetagang_[a-z_]+|up\{job=\"thetagang(-strategy)?\"\}", e) for e in exprs)
 
 
@@ -410,6 +410,24 @@ def test_a_stopped_project_never_alerts_only_one_that_stops_after_running():
         assert cond == {"type": "gt", "params": [0.5]}
     for rule in rules.values():  # every other rule is silent without data
         assert rule["noDataState"] == "OK"
+
+
+def test_thetagang_session_health_alert_checks_only_recently_active_roles():
+    rules = {r["uid"]: r for r in _rules()}
+    rule = rules["tg-ib-session-unhealthy"]
+    (expr,) = [d["model"]["expr"] for d in rule["data"] if d["refId"] == "A"]
+
+    assert set(re.findall(r'up\{job="([^"]+)"\}\[8h\]', expr)) == {
+        "thetagang",
+        "thetagang-strategy",
+    }
+    assert set(
+        re.findall(r'thetagang_ib_session_healthy\{role="([^"]+)"\}\s*==\s*1', expr)
+    ) == {"monitor", "trade"}
+    assert expr.count("unless on(job, instance)") == 2
+    assert rule["labels"] == {"window": "thetagang", "account": "live"}
+    assert rule["noDataState"] == "OK"
+    assert "or vector(0)" not in expr
 
 
 def test_fit_sizes_tables_to_their_rows_and_restacks_the_bands():
