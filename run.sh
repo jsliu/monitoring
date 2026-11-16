@@ -76,7 +76,8 @@ YAML
 }
 
 health_check() {
-    local expected_account expected_client_id targets job role client_id account_label query response check
+    local expected_account expected_client_id running_services targets job service role client_id
+    local account_label query response check
     expected_account=$(env_value THETAGANG_EXPECTED_IB_ACCOUNT_ID)
     expected_client_id=$(env_value THETAGANG_EXPECTED_IB_CLIENT_ID)
     if [[ -z "$expected_account" || ! "$expected_client_id" =~ ^[0-9]+$ ]]; then
@@ -84,6 +85,11 @@ health_check() {
         return 1
     fi
     expected_client_id=$((10#$expected_client_id))
+    if ! running_services=$(docker compose -f ../thetagang/deploy/docker-compose.yml \
+        --profile trading ps --status running --services); then
+        echo "error: could not read running thetagang Compose services" >&2
+        return 1
+    fi
     if ! targets=$(curl -fsS --connect-timeout 2 --max-time 5 http://127.0.0.1:9090/api/v1/targets); then
         echo "error: Prometheus is not reachable (is the stack up?)" >&2
         return 1
@@ -91,11 +97,17 @@ health_check() {
     local failed=0
     for job in thetagang thetagang-strategy; do
         if [[ "$job" == thetagang ]]; then
+            service=thetagang-monitor
             role=monitor
             client_id=$((expected_client_id + 1))
         else
+            service=thetagang-nt
             role=trade
             client_id=$expected_client_id
+        fi
+        if ! grep -Fxq "$service" <<< "$running_services"; then
+            echo "$job: not expected ($service is not running)"
+            continue
         fi
         local target_health
         if ! target_health=$(python3 -c 'import json,sys
@@ -105,7 +117,8 @@ print(next((t["health"] for t in targets if t["labels"].get("job")==sys.argv[1])
             return 1
         fi
         if [[ "$target_health" != up ]]; then
-            echo "$job: not expected (target is $target_health)"
+            echo "$job: scrape target is $target_health while $service is running" >&2
+            failed=1
             continue
         fi
 

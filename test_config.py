@@ -169,7 +169,9 @@ def _health_metric(role="monitor", client_id="42", account="U123", value="1", ti
     }
 
 
-def _run_monitoring_script(tmp_path, command, targets, metrics, account="U123"):
+def _run_monitoring_script(
+    tmp_path, command, targets, metrics, account="U123", running_services=("thetagang-monitor",)
+):
     env_file = tmp_path / ".env"
     env_file.write_text(
         "TELEGRAM_BOT_TOKEN=123456:AAH-abc_def\n"
@@ -198,40 +200,48 @@ print(json.dumps({"status": "success", "data": data}))
     )
     curl.chmod(0o755)
     query_log = tmp_path / "queries"
-    extra = {}
-    if command == "up":
-        docker = fake_bin / "docker"
-        docker.write_text("#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$DOCKER_LOG\"\n")
-        docker.chmod(0o755)
-        extra["DOCKER_LOG"] = str(tmp_path / "docker.log")
+    docker = fake_bin / "docker"
+    docker.write_text(
+        """#!/usr/bin/env python3
+import os, sys
+args = sys.argv[1:]
+with open(os.environ["DOCKER_LOG"], "a") as log:
+    log.write(" ".join(args) + "\\n")
+if "ps" in args:
+    print(os.environ["RUNNING_SERVICES"])
+"""
+    )
+    docker.chmod(0o755)
     return subprocess.run(
         ["bash", str(SCRIPT), command],
         capture_output=True,
         text=True,
         env={
             **os.environ,
-            **extra,
             "PATH": f"{fake_bin}:{os.environ['PATH']}",
             "MONITORING_ENV_FILE": str(env_file),
             "CONTACT_POINT_FILE": str(tmp_path / "contact-point.yaml"),
             "PROM_TARGETS": json.dumps(targets),
             "PROM_METRICS": json.dumps(metrics),
             "PROM_QUERY_LOG": str(query_log),
+            "RUNNING_SERVICES": "\n".join(running_services),
+            "DOCKER_LOG": str(tmp_path / "docker.log"),
         },
     ), query_log, tmp_path
 
 
 def test_health_accepts_a_matching_monitor_and_an_absent_strategy_target(tmp_path):
-    proc, query_log, _ = _run_monitoring_script(
+    proc, query_log, work = _run_monitoring_script(
         tmp_path, "health", [_target("thetagang")], [_health_metric()]
     )
 
     assert proc.returncode == 0, proc.stderr
     assert "thetagang-strategy: not expected" in proc.stdout
     assert 'account="U123",role="monitor",client_id="42"' in query_log.read_text()
+    assert "--profile trading ps --status running --services" in (work / "docker.log").read_text()
 
 
-def test_health_treats_a_down_strategy_target_as_not_expected(tmp_path):
+def test_health_treats_a_down_target_as_not_expected_when_trade_service_is_stopped(tmp_path):
     proc, _, _ = _run_monitoring_script(
         tmp_path,
         "health",
@@ -243,12 +253,55 @@ def test_health_treats_a_down_strategy_target_as_not_expected(tmp_path):
     assert "thetagang-strategy: not expected" in proc.stdout
 
 
+def test_health_rejects_a_down_strategy_target_when_trade_service_is_running(tmp_path):
+    proc, _, _ = _run_monitoring_script(
+        tmp_path,
+        "health",
+        [_target("thetagang"), _target("thetagang-strategy", "down")],
+        [_health_metric()],
+        running_services=("thetagang-monitor", "thetagang-nt"),
+    )
+
+    assert proc.returncode != 0
+    assert "thetagang-strategy" in proc.stderr
+
+
+def test_health_rejects_a_missing_strategy_target_when_trade_service_is_running(tmp_path):
+    proc, _, _ = _run_monitoring_script(
+        tmp_path,
+        "health",
+        [_target("thetagang")],
+        [_health_metric()],
+        running_services=("thetagang-monitor", "thetagang-nt"),
+    )
+
+    assert proc.returncode != 0
+    assert "thetagang-strategy" in proc.stderr
+
+
+def test_health_rejects_a_down_monitor_target_when_monitor_service_is_running(tmp_path):
+    proc, _, _ = _run_monitoring_script(
+        tmp_path, "health", [_target("thetagang", "down")], []
+    )
+
+    assert proc.returncode != 0
+    assert "thetagang" in proc.stderr
+
+
+def test_health_rejects_a_missing_monitor_target_when_monitor_service_is_running(tmp_path):
+    proc, _, _ = _run_monitoring_script(tmp_path, "health", [], [])
+
+    assert proc.returncode != 0
+    assert "thetagang" in proc.stderr
+
+
 def test_health_accepts_matching_monitor_and_strategy_targets(tmp_path):
     proc, query_log, _ = _run_monitoring_script(
         tmp_path,
         "health",
         [_target("thetagang"), _target("thetagang-strategy")],
         [_health_metric(), _health_metric("trade", "41")],
+        running_services=("thetagang-monitor", "thetagang-nt"),
     )
 
     assert proc.returncode == 0, proc.stderr
@@ -261,6 +314,7 @@ def test_health_rejects_a_mismatched_trade_identity(tmp_path):
         "health",
         [_target("thetagang"), _target("thetagang-strategy")],
         [_health_metric(), _health_metric("trade", "42")],
+        running_services=("thetagang-monitor", "thetagang-nt"),
     )
 
     assert proc.returncode != 0
