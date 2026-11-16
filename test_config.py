@@ -417,13 +417,16 @@ def test_thetagang_session_health_alert_checks_only_recently_active_roles():
     rule = rules["tg-ib-session-unhealthy"]
     (expr,) = [d["model"]["expr"] for d in rule["data"] if d["refId"] == "A"]
 
-    assert set(re.findall(r'up\{job="([^"]+)"\}\[8h\]', expr)) == {
-        "thetagang",
-        "thetagang-strategy",
-    }
-    assert set(
-        re.findall(r'thetagang_ib_session_healthy\{role="([^"]+)"\}\s*==\s*1', expr)
-    ) == {"monitor", "trade"}
+    branches = expr.split(" or ")
+    assert len(branches) == 2
+    role_by_job = {}
+    for branch in branches:
+        (job,) = re.findall(r'up\{job="([^"]+)"\}\[8h\]', branch)
+        (role,) = re.findall(
+            r'thetagang_ib_session_healthy\{role="([^"]+)"\}\s*==\s*1', branch
+        )
+        role_by_job[job] = role
+    assert role_by_job == {"thetagang": "monitor", "thetagang-strategy": "trade"}
     assert expr.count("unless on(job, instance)") == 2
     assert rule["labels"] == {"window": "thetagang", "account": "live"}
     assert rule["noDataState"] == "OK"
