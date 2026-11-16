@@ -6,6 +6,7 @@ import os
 import re
 import stat
 import subprocess
+import time
 from pathlib import Path
 
 import pytest
@@ -149,6 +150,177 @@ def test_grafana_gets_only_its_password():
 def test_env_example_says_the_grafana_password_applies_at_the_first_start_only():
     text = (ROOT / ".env.example").read_text()
     assert "first start" in text and "$" in text  # also warns about shell characters
+
+
+def test_env_example_configures_the_expected_thetagang_identity():
+    text = (ROOT / ".env.example").read_text()
+    assert "THETAGANG_EXPECTED_IB_ACCOUNT_ID=" in text
+    assert "THETAGANG_EXPECTED_IB_CLIENT_ID=" in text
+
+
+def _target(job, health="up"):
+    return {"labels": {"job": job}, "health": health, "scrapeUrl": f"http://{job}"}
+
+
+def _health_metric(role="monitor", client_id="42", account="U123", value="1", timestamp=None):
+    return {
+        "metric": {"role": role, "client_id": client_id, "account": account},
+        "value": [timestamp if timestamp is not None else time.time(), value],
+    }
+
+
+def _run_monitoring_script(tmp_path, command, targets, metrics, account="U123"):
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        "TELEGRAM_BOT_TOKEN=123456:AAH-abc_def\n"
+        "TELEGRAM_CHAT_ID=42\n"
+        "GF_SECURITY_ADMIN_PASSWORD=pw\n"
+        f"THETAGANG_EXPECTED_IB_ACCOUNT_ID={account}\n"
+        "THETAGANG_EXPECTED_IB_CLIENT_ID=41\n"
+    )
+    fake_bin = tmp_path / "bin"
+    fake_bin.mkdir()
+    curl = fake_bin / "curl"
+    curl.write_text(
+        """#!/usr/bin/env python3
+import json, os, sys
+args = sys.argv[1:]
+for arg in args:
+    if arg.startswith("query="):
+        with open(os.environ["PROM_QUERY_LOG"], "a") as log:
+            log.write(arg[len("query="):] + "\\n")
+if args[-1].endswith("/api/v1/targets"):
+    data = {"activeTargets": json.loads(os.environ["PROM_TARGETS"])}
+else:
+    data = {"resultType": "vector", "result": json.loads(os.environ["PROM_METRICS"])}
+print(json.dumps({"status": "success", "data": data}))
+"""
+    )
+    curl.chmod(0o755)
+    query_log = tmp_path / "queries"
+    extra = {}
+    if command == "up":
+        docker = fake_bin / "docker"
+        docker.write_text("#!/bin/sh\nprintf '%s\\n' \"$*\" >> \"$DOCKER_LOG\"\n")
+        docker.chmod(0o755)
+        extra["DOCKER_LOG"] = str(tmp_path / "docker.log")
+    return subprocess.run(
+        ["bash", str(SCRIPT), command],
+        capture_output=True,
+        text=True,
+        env={
+            **os.environ,
+            **extra,
+            "PATH": f"{fake_bin}:{os.environ['PATH']}",
+            "MONITORING_ENV_FILE": str(env_file),
+            "CONTACT_POINT_FILE": str(tmp_path / "contact-point.yaml"),
+            "PROM_TARGETS": json.dumps(targets),
+            "PROM_METRICS": json.dumps(metrics),
+            "PROM_QUERY_LOG": str(query_log),
+        },
+    ), query_log, tmp_path
+
+
+def test_health_accepts_a_matching_monitor_and_an_absent_strategy_target(tmp_path):
+    proc, query_log, _ = _run_monitoring_script(
+        tmp_path, "health", [_target("thetagang")], [_health_metric()]
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    assert "thetagang-strategy: not expected" in proc.stdout
+    assert 'account="U123",role="monitor",client_id="42"' in query_log.read_text()
+
+
+def test_health_treats_a_down_strategy_target_as_not_expected(tmp_path):
+    proc, _, _ = _run_monitoring_script(
+        tmp_path,
+        "health",
+        [_target("thetagang"), _target("thetagang-strategy", "down")],
+        [_health_metric()],
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    assert "thetagang-strategy: not expected" in proc.stdout
+
+
+def test_health_accepts_matching_monitor_and_strategy_targets(tmp_path):
+    proc, query_log, _ = _run_monitoring_script(
+        tmp_path,
+        "health",
+        [_target("thetagang"), _target("thetagang-strategy")],
+        [_health_metric(), _health_metric("trade", "41")],
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    assert 'account="U123",role="trade",client_id="41"' in query_log.read_text()
+
+
+def test_health_rejects_a_mismatched_trade_identity(tmp_path):
+    proc, _, _ = _run_monitoring_script(
+        tmp_path,
+        "health",
+        [_target("thetagang"), _target("thetagang-strategy")],
+        [_health_metric(), _health_metric("trade", "42")],
+    )
+
+    assert proc.returncode != 0
+    assert "thetagang-strategy" in proc.stderr
+
+
+@pytest.mark.parametrize(
+    "metric",
+    [
+        _health_metric(account="U999"),
+        _health_metric(client_id="43"),
+        _health_metric(role="trade"),
+        _health_metric(value="0"),
+    ],
+)
+def test_health_rejects_wrong_identity_or_unhealthy_metrics(tmp_path, metric):
+    proc, _, _ = _run_monitoring_script(tmp_path, "health", [_target("thetagang")], [metric])
+
+    assert proc.returncode != 0
+    assert "thetagang" in proc.stderr
+
+
+def test_health_rejects_a_missing_metric_for_a_running_target(tmp_path):
+    proc, _, _ = _run_monitoring_script(tmp_path, "health", [_target("thetagang")], [])
+
+    assert proc.returncode != 0
+    assert "thetagang" in proc.stderr
+
+
+def test_health_rejects_a_stale_metric_for_a_running_target(tmp_path):
+    proc, _, _ = _run_monitoring_script(
+        tmp_path, "health", [_target("thetagang")], [_health_metric(timestamp=time.time() - 120)]
+    )
+
+    assert proc.returncode != 0
+    assert "thetagang" in proc.stderr
+
+
+def test_health_escapes_account_label_values_in_prometheus_queries(tmp_path):
+    account = 'U"12\\3'
+    proc, query_log, _ = _run_monitoring_script(
+        tmp_path,
+        "health",
+        [_target("thetagang")],
+        [_health_metric(account=account)],
+        account=account,
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    assert 'account="U\\"12\\\\3"' in query_log.read_text()
+
+
+def test_up_starts_monitoring_even_when_the_bot_health_check_fails(tmp_path):
+    proc, query_log, work = _run_monitoring_script(
+        tmp_path, "up", [_target("thetagang")], []
+    )
+
+    assert proc.returncode == 0, proc.stderr
+    assert "up -d" in (work / "docker.log").read_text()
+    assert query_log.exists()
 
 
 def test_the_intraday_drawdown_panel_says_trailing_and_scales_its_resolution_with_the_range():

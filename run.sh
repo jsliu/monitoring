@@ -4,6 +4,7 @@
 #
 #   ./run.sh up          # start (or update) the stack; Grafana at http://localhost:3000 (user admin)
 #   ./run.sh status      # containers + which projects' metrics Prometheus can reach
+#   ./run.sh health      # check the expected thetagang IB sessions for running targets
 #   ./run.sh test-alert  # send a Telegram test message with .env's bot token and chat id
 #   ./run.sh fit         # size the thetagang tables to their rows (no scrollbars)
 #   ./run.sh down        # stop it (history is kept in the Docker volumes)
@@ -74,6 +75,91 @@ YAML
     return 0
 }
 
+health_check() {
+    local expected_account expected_client_id targets job role client_id account_label query response check
+    expected_account=$(env_value THETAGANG_EXPECTED_IB_ACCOUNT_ID)
+    expected_client_id=$(env_value THETAGANG_EXPECTED_IB_CLIENT_ID)
+    if [[ -z "$expected_account" || ! "$expected_client_id" =~ ^[0-9]+$ ]]; then
+        echo "error: set THETAGANG_EXPECTED_IB_ACCOUNT_ID and numeric THETAGANG_EXPECTED_IB_CLIENT_ID in $ENV_FILE" >&2
+        return 1
+    fi
+    expected_client_id=$((10#$expected_client_id))
+    if ! targets=$(curl -fsS --connect-timeout 2 --max-time 5 http://127.0.0.1:9090/api/v1/targets); then
+        echo "error: Prometheus is not reachable (is the stack up?)" >&2
+        return 1
+    fi
+    local failed=0
+    for job in thetagang thetagang-strategy; do
+        if [[ "$job" == thetagang ]]; then
+            role=monitor
+            client_id=$((expected_client_id + 1))
+        else
+            role=trade
+            client_id=$expected_client_id
+        fi
+        local target_health
+        if ! target_health=$(python3 -c 'import json,sys
+targets=json.load(sys.stdin)["data"]["activeTargets"]
+print(next((t["health"] for t in targets if t["labels"].get("job")==sys.argv[1]), "absent"))' "$job" <<< "$targets"); then
+            echo "error: could not read Prometheus target status for $job" >&2
+            return 1
+        fi
+        if [[ "$target_health" != up ]]; then
+            echo "$job: not expected (target is $target_health)"
+            continue
+        fi
+
+        account_label=${expected_account//\\/\\\\}
+        account_label=${account_label//\"/\\\"}
+        query="thetagang_ib_session_healthy{account=\"$account_label\",role=\"$role\",client_id=\"$client_id\"}"
+        if ! response=$(curl -fsS --connect-timeout 2 --max-time 5 --get \
+            --data-urlencode "query=$query" http://127.0.0.1:9090/api/v1/query); then
+            echo "error: Prometheus query failed for $job" >&2
+            failed=1
+            continue
+        fi
+        if check=$(python3 -c 'import json,sys,time
+expected_role, expected_account, expected_client_id = sys.argv[1:]
+try:
+    data = json.load(sys.stdin)
+    samples = data["data"]["result"]
+except (KeyError, TypeError, ValueError):
+    print("invalid Prometheus response")
+    sys.exit(1)
+if data.get("status") != "success" or not samples:
+    print("missing or mismatched metric")
+    sys.exit(1)
+for sample in samples:
+    labels = sample.get("metric", {})
+    if (labels.get("role"), labels.get("account"), labels.get("client_id")) != (
+        expected_role, expected_account, expected_client_id
+    ):
+        continue
+    try:
+        timestamp, value = float(sample["value"][0]), float(sample["value"][1])
+    except (IndexError, TypeError, ValueError):
+        print("invalid metric value")
+        sys.exit(1)
+    age = time.time() - timestamp
+    if age < 0 or age > 60:
+        print("stale metric")
+        sys.exit(1)
+    if value != 1:
+        print("unhealthy metric")
+        sys.exit(1)
+    print("healthy")
+    sys.exit(0)
+print("wrong account, role, or client ID")
+sys.exit(1)' "$role" "$expected_account" "$client_id" <<< "$response"); then
+            echo "$job: $check"
+        else
+            echo "$job: $check" >&2
+            failed=1
+        fi
+    done
+    return "$failed"
+}
+
 case "${1:-}" in
     up)
         need_env
@@ -84,6 +170,9 @@ case "${1:-}" in
             "${COMPOSE[@]}" restart grafana >/dev/null  # Grafana reads provisioning only at startup
         fi
         echo "Grafana: http://localhost:3000 (user admin)  Prometheus: http://localhost:9090"
+        if ! health_check; then
+            echo "warning: thetagang health check failed; monitoring is running" >&2
+        fi
         ;;
     render)
         need_env
@@ -102,6 +191,10 @@ for t in json.load(sys.stdin)["data"]["activeTargets"]:
     print("  %-10s %-5s %s" % (t["labels"]["job"], t["health"], t["scrapeUrl"]))' \
             || echo "prometheus: not reachable (is the stack up?)"
         ;;
+    health)
+        need_env
+        health_check
+        ;;
     fit)
         python3 fit_tables.py  # size the thetagang tables to their rows; Grafana reloads the file
         ;;
@@ -115,7 +208,7 @@ for t in json.load(sys.stdin)["data"]["activeTargets"]:
             && echo "sent -- check Telegram" || { echo "error: Telegram rejected the token / chat id" >&2; exit 1; }
         ;;
     *)
-        echo "usage: $0 up|down|status|fit|test-alert|render" >&2
+        echo "usage: $0 up|down|status|health|fit|test-alert|render" >&2
         exit 2
         ;;
 esac
